@@ -15,24 +15,31 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.static('public'));
 
-// app.get('/', (req, res) => {
-//     res.render('index')
-// });
+app.get('/', (req, res) => {
+    res.render('index')
+});
 
 app.get('/draw', (req, res) => {
     res.render('draw')
 });
 
 io.on('connection', (socket) => {
-    // socket.on('chat message', (msg) => {
-    //     socket.broadcast.emit('chat message', msg);
-    // });
+    socket.on('guess', (msg) => {
+        io.emit('guess', msg);
+    });
+
+    socket.on('chat', (msg) => {
+        io.emit('chat', msg);
+    });
+
     socket.on('beginDraw', function(e){
         socket.broadcast.emit('beginDraw',e);
     });
+
     socket.on('draw', function(e) {
-        socket.broadcast.emit('draw',e);//除了自己的都更新
+        socket.broadcast.emit('draw',e);
      });
+
     socket.on('endDraw', function() {
         io.emit('endDraw');
     });

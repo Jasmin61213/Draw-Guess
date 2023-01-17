@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Rowdies&display=swap');
+
+body{
+    background: rgb(47, 47, 232);
+    font-family: 'Rowdies', cursive;
+    margin: 0;
+}
+
+.content{
+    display: flex;
+    width: 1200px;
+    margin:0px auto;
+}
+
+.left{
+    flex: none;
+}
+
+.right{
+    flex: none;
+}
+
+.title{
+    margin: 5px 0 10px 0;
+    font-size: 48px;
+    color: #ffde05;
+}
+
+.pencil{
+    width:48px;
+    margin-left: 10px;
+}
+
+canvas{
+    margin: 0 0 20px 0;
+    background-color: #fff;
+    border-radius: 15px;
+}
+
+.member{
+    margin: 0 0 20px 0;
+    width: 800px;
+    height: 100px;
+    background-color: #fff;
+    border-radius: 15px;
+}
+
+.guess{
+    position: relative;
+    margin: 75px 0 20px 20px;
+    width: 380px;
+    height: 292px;
+    background-color: #fff;
+    border-radius: 15px;
+}
+
+.chat{
+    position: relative;
+    margin: 0 0 0 20px;
+    width: 380px;
+    height: 292px;
+    background-color: #fff;
+    border-radius: 15px;
+}
+
+.form{
+    width: 380px;
+    position: absolute;
+    top: 250px;
+    left: 10px;
+    /* background-color: blue; */
+    /* height: 3rem; */
+}
+
+.input{
+    width: 300px;
+    border: 0;
+    border-width: 2px 0 2px 2px;
+    border-style: solid;
+    border-color: #d1e7ff;
+    border-radius: 5px 0 0 5px;
+    height: 24px;
+    padding-left: 10px;
+    font-size: 16px;
+
+}
+
+input:focus{
+    outline: none;
+}
+
+.button{
+    /* width: 20px; */
+    border: none;
+    border-radius: 0 5px 5px 0;
+    border-width: 2px 2px 2px 0;
+    background-color: rgb(47, 47, 232);
+    color: #fff;
+    height: 30px;
+}
+
+.message{
+    list-style-type: none;
+    margin: 10px;
+    padding: 10px;
+    height: 220px;
+    overflow:auto;
+}
+
+.li{
+    font-size: 20px;
+}

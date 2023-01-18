@@ -1,5 +1,5 @@
 //socket
-const socket = io();
+// const socket = io();
 
 //canvas
 const canvas = document.getElementById('canvas');

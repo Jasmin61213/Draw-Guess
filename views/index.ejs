@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>canvas</title>
+        <link rel="stylesheet" type="text/css" href="/css/index.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="title">Draw & Guess</div>
+            <!-- <img src='/image/pencil.png' class="pencil"> -->
+            <div class="wrap-all">
+                <div class="wrap">
+                    <img src="/image/cat.png" class="member">
+                    <div class="title-text">請輸入暱稱：</div>
+                    <div class="input-div">
+                        <input type="text" class="input" id="username">
+                        <button class="button" onclick="postUser()"><img src='/image/pencillittle.png' width="26px"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/js/index.js"></script>
+        <!-- <iframe id="myIframe" name="hideIframe" style="display:none;"></iframe>     -->
+    </body>
+</html>    

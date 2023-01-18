@@ -1,37 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>canvas</title>
-    <link rel="stylesheet" type="text/css" href="/css/draw.css">
-</head>
-<body>
-    <div class="content">
-        <div class="left">
-            <div class="title">Draw & Guess<img src="/image/pencilbl.png" class="pencil"></div>
-            
-            <!-- <div class="canvas"> -->
-                <canvas id="canvas" width="800" height="480"></canvas>
-            <!-- </div> -->
-            <div class="member"></div>
-        </div>
-        <div class="right">
-            <div class="guess">
-                <ul id="guess-messages" class="message"></ul>
-                <form id="guess-form" action="" class="form">
-                    <input id="guess-input" autocomplete="off" class="input"><button class="button">Send</button>
-                </form>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>canvas</title>
+        <link rel="stylesheet" type="text/css" href="/css/draw.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="left">
+                <div class="title">Draw & Guess<img src="/image/pencil.png" class="pencil"></div>
+                <!-- <div class="canvas"> -->
+                    <canvas id="canvas" width="800" height="480"></canvas>
+                <!-- </div> -->
+                <div class="member"></div>
             </div>
-            <div class="chat">
-                <ul id="chat-messages" class="message"></ul>
-                <form id="chat-form" action="" class="form">
-                    <input id="chat-input" autocomplete="off" class="input"><button class="button">Send</button>
-                </form>
+            <div class="right">
+                <div class="guess">
+                    <ul id="guess-messages" class="message"></ul>
+                    <form id="guess-form" action="" class="form">
+                        <div class="input-div">
+                            <input id="guess-input" autocomplete="off" class="input" placeholder="請輸入答案">
+                            <button class="button"><img src="/image/pencillittle.png" width="26px"></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="chat">
+                    <ul id="chat-messages" class="message"></ul>
+                    <form id="chat-form" action="" class="form">
+                        <div class="input-div">
+                            <input id="chat-input" autocomplete="off" class="input" placeholder="請輸入訊息">
+                            <button class="button"><img src="/image/pencillittle.png" width="26px"></button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/draw.js"></script>
-    <script src="/js/message.js"></script>
-</body>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/common.js"></script>
+        <script src="/js/draw.js"></script>
+        <script src="/js/message.js"></script>
+        <iframe id="myIframe" name="hideIframe" style="display:none;"></iframe>    
+    </body>
+</html>

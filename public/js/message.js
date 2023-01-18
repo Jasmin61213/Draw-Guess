@@ -9,15 +9,20 @@ const chatInput = document.getElementById('chat-input');
 guessForm.addEventListener('submit', function(e) {
     e.preventDefault();
     if (guessInput.value){
-        socket.emit('guess', guessInput.value);
-        guessInput.value = '';
-    }
+        if (guessInput.value == answer){
+            socket.emit('guess', '恭喜答對了！');
+            guessInput.value = '';
+        }else{
+            socket.emit('guess', guessInput.value, roomId);
+            guessInput.value = '';
+        };
+    };
 });
 
-socket.on('guess', function(msg) {
+socket.on('guess', function(msg, userName) {
     const guessItem = document.createElement('li');
     guessItem.className = 'li'
-    guessItem.textContent = msg;
+    guessItem.textContent = userName + '猜' + msg;
     guessMessages.appendChild(guessItem);
     guessMessages.scrollTo(0, guessMessages.scrollHeight);
 });
@@ -25,15 +30,15 @@ socket.on('guess', function(msg) {
 chatForm.addEventListener('submit', function(e) {
     e.preventDefault();
     if (chatInput.value){
-        socket.emit('chat', chatInput.value);
+        socket.emit('chat', chatInput.value, roomId);
         chatInput.value = '';
     }
 });
 
-socket.on('chat', function(msg) {
+socket.on('chat', function(msg, userName) {
     const chatItem = document.createElement('li');
     chatItem.className = 'li'
-    chatItem.textContent = msg;
+    chatItem.textContent = userName +'：'+ msg;
     chatMessages.appendChild(chatItem);
     chatMessages.scrollTo(0, chatMessages.scrollHeight);
 });

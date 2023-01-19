@@ -52,3 +52,11 @@ socket.on('connectToRoom',function(data) {
     chatMessages.appendChild(roomItem);
     chatMessages.scrollTo(0, chatMessages.scrollHeight);
 });
+
+socket.on('leaveRoom',function(data) {
+    const roomItem = document.createElement('li');
+    roomItem.className = 'li'
+    roomItem.textContent = data;
+    chatMessages.appendChild(roomItem);
+    chatMessages.scrollTo(0, chatMessages.scrollHeight);
+});

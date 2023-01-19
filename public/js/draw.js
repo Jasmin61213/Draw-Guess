@@ -1,5 +1,10 @@
 //socket
-// const socket = io();
+const socket = io();
+
+const params = new URLSearchParams(window.location.search);
+const roomId = params.get('room');
+socket.emit('join-room', roomId);
+// socket.emit('leave-room', roomId);
 
 //canvas
 const canvas = document.getElementById('canvas');
@@ -11,7 +16,7 @@ let lastY = 0;
 ctx.strokeStyle = "#1A090D"; // 畫筆顏色
 ctx.lineWidth = 4;
 ctx.lineJoin = "round"; // 畫筆圓角
-ctx.lineCap = "round"; //
+ctx.lineCap = "round"; // 畫筆圓角
 
 //點按滑鼠更新座標
 canvas.addEventListener('mousedown', function(obj){
@@ -22,7 +27,7 @@ canvas.addEventListener('mousedown', function(obj){
     {
         'x':obj.offsetX,
         'y':obj.offsetY
-    })
+    }, roomId)
 });
 
 //移動滑鼠開始畫畫
@@ -30,7 +35,7 @@ canvas.addEventListener('mousemove', function(obj){
     if(!isDrawing){
         return
     };
-    ctx.beginPath();          //路徑開始
+    ctx.beginPath(); //路徑開始
     ctx.moveTo(lastX, lastY); //移動路徑
     ctx.lineTo(obj.offsetX, obj.offsetY); //畫出路徑
     ctx.stroke();
@@ -42,19 +47,19 @@ canvas.addEventListener('mousemove', function(obj){
     {
         'x':obj.offsetX,
         'y':obj.offsetY
-    })
+    }, roomId)
 });
 
 //當滑鼠放開時，停止畫畫
 canvas.addEventListener("mouseup", function(){
     isDrawing = false;
-    socket.emit('endDraw')
+    socket.emit('endDraw', roomId)
 });
 
 //當滑鼠離開畫布時，停止畫畫
 canvas.addEventListener("mouseout", function(){
     isDrawing = false;
-    socket.emit('endDraw')
+    socket.emit('endDraw', roomId)
 });
 
 // 接收畫畫開始座標

@@ -6,6 +6,8 @@ const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 
+const answer = '烏龜'
+
 guessForm.addEventListener('submit', function(e) {
     e.preventDefault();
     if (guessInput.value){
@@ -40,5 +42,13 @@ socket.on('chat', function(msg, userName) {
     chatItem.className = 'li'
     chatItem.textContent = userName +'：'+ msg;
     chatMessages.appendChild(chatItem);
+    chatMessages.scrollTo(0, chatMessages.scrollHeight);
+});
+
+socket.on('connectToRoom',function(data) {
+    const roomItem = document.createElement('li');
+    roomItem.className = 'li'
+    roomItem.textContent = data;
+    chatMessages.appendChild(roomItem);
     chatMessages.scrollTo(0, chatMessages.scrollHeight);
 });

@@ -11,13 +11,14 @@ const topic = ['烏龜','貓','狗','兔子']
 
 const answer = topic[roomStatus.answer]
 
-socket.on('connectToRoom',function(data) {
-    const roomItem = document.createElement('li');
-    roomItem.className = 'li'
-    roomItem.textContent = data;
-    chatMessages.appendChild(roomItem);
-    chatMessages.scrollTo(0, chatMessages.scrollHeight);
-});
+// socket.on('connectToRoom',function(data) {
+//     console.log(data)
+//     const roomItem = document.createElement('li');
+//     roomItem.className = 'li'
+//     roomItem.textContent = data;
+//     chatMessages.appendChild(roomItem);
+//     chatMessages.scrollTo(0, chatMessages.scrollHeight);
+// });
 
 // socket.on('leaveRoom',function(data) {
 //     const roomItem = document.createElement('li');
@@ -29,13 +30,14 @@ socket.on('connectToRoom',function(data) {
 
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get('room');
-socket.on('connect', function(){
-    if (roomId) {
-        socket.emit('join-room', roomId);
-    } else {
-        socket.emit('create-room');
-    }
-});
+socket.emit('join-room', roomId);
+// socket.on('connect', function(){
+//     if (roomId) {
+//         socket.emit('join-room', roomId);
+//     } else {
+//         socket.emit('create-room');
+//     }
+// });
 socket.on('join-room-message', (message) => {
     console.log(message);
 });

@@ -1,10 +1,64 @@
+let user;
+
+//驗證登入者
+fetch('/getLogin')
+.then(function(response){
+    return response.json()
+})
+.then(function(res){
+    if (res.ok == true){
+        user = res.user;
+    };
+});
+// console.log(user)
+
 //socket
 const socket = io();
 
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get('room');
 socket.emit('join-room', roomId);
-// socket.emit('leave-room', roomId);
+// socket.emit('roomInfo')
+// socket.on('roomInfo', (roomInfo) => {
+//     socket.emit('roomInfo', roomInfo)
+// });
+// socket.on('allRoomInfo', (roomId, allRoomInfo) => {
+    
+// });
+
+//跳出框
+// function remind(){
+
+// }
+
+//題目
+const topic = ['烏龜','貓','狗','兔子']
+
+
+
+//成員列表
+const memberWrap = document.querySelector('.member')
+socket.on('member',(member) =>{
+    socket.on('score', (score) => {
+        const block = document.querySelectorAll(".memberBlock")
+        for (i = 0; i<block.length; i++){
+            block[i].remove();
+        };
+        for (let i=0; i<member.length; i++){
+            const memberBlock = document.createElement('div');
+            memberBlock.className = 'memberBlock';
+            const memberName = document.createElement('div');
+            memberName.className = 'memberName'
+            memberName.textContent = member[i]
+            const memberScore = document.createElement('div');
+            memberScore.className = 'memberScore'
+            memberScore.textContent = 'Score：' + score[member[i]]
+            memberBlock.appendChild(memberName)
+            memberBlock.appendChild(memberScore)
+            memberWrap.appendChild(memberBlock)
+        };
+    });
+});
 
 //canvas
 const canvas = document.getElementById('canvas');

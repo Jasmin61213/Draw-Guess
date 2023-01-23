@@ -35,17 +35,54 @@ body{
 }
 
 canvas{
+    position: static;
     margin: 0 0 20px 0;
     background-color: #fff;
     border-radius: 15px;
 }
 
-.member{
-    margin: 0 0 20px 0;
+.start{
+    position: absolute;
+    top: 80px;
     width: 800px;
-    height: 100px;
+    height: 480px;
     background-color: #fff;
     border-radius: 15px;
+}
+
+.member{
+    display: flex;
+    margin: 0 0 20px 0;
+    width: 790px;
+    height: 80px;
+    background-color: #fff;
+    border-radius: 15px;
+    padding: 10px 10px 10px 0px;
+}
+
+.memberBlock{
+    width: 175px;
+    height: 80px;
+    background-color: #ECE2D0;
+    border-radius: 10px;
+    margin-left: 20px;
+}
+
+.memberName{
+    font-family: 'Rowdies', cursive;
+    /* font-family: 'Noto Sans TC', sans-serif; */
+    text-align: center;
+    margin: 8px 0 0 50px;
+    font-size: 24px;
+    color: #65524D;
+}
+
+.memberScore{
+    font-family: 'Rowdies', cursive;
+    text-align: center;
+    margin: 5px 0 0 50px;
+    font-size: 20px;
+    color: #65524D;
 }
 
 .guess{

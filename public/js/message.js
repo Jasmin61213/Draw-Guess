@@ -6,19 +6,19 @@ const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 
-const answer = '烏龜'
+// const answer = '烏龜'
 
 guessForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    if (guessInput.value){
-        if (guessInput.value == answer){
-            socket.emit('guess', '恭喜答對了！');
-            guessInput.value = '';
-        }else{
+    // if (guessInput.value){
+        // if (guessInput.value == answer){
+        //     // socket.emit('guess', '恭喜答對了！', roomId);
+        //     guessInput.value = '';
+        // }else{
             socket.emit('guess', guessInput.value, roomId);
             guessInput.value = '';
-        };
-    };
+        // };
+    // };
 });
 
 socket.on('guess', function(msg, userName) {

@@ -9,21 +9,17 @@
     <body>
         <div class="content">
             <div class="left">
-                <div class="title">Draw & Guess<img src="/image/pencil.png" class="pencil"></div>
-                <!-- <div class="canvas"> -->
+                <a href='/lobby'><div class="title" data-storke="Draw & Guess">Draw & Guess<img src="/image/pencil.png" class="pencil"></div></a>
                     <canvas id="canvas" width="800" height="480"></canvas>
-                    <div class="start"></div>
-                <!-- </div> -->
-                <div class="member">
-                    <!-- <div class="memberBlock">
-                        <div class="memberName">jasmin</div>
+                    <div class="start">
+                        <div class="wait-text">等待其他玩家加入......</div>
+                        <button class="start-button">開始遊戲</button>
                     </div>
-                    <div class="memberBlock"></div>
-                    <div class="memberBlock"></div>
-                    <div class="memberBlock"></div> -->
-                </div>
+                <div class="member-list">Member</div>
+                <div class="member"></div>
             </div>
             <div class="right">
+                <div class="guess-list">Guess</div>
                 <div class="guess">
                     <ul id="guess-messages" class="message"></ul>
                     <form id="guess-form" action="" class="form">
@@ -33,6 +29,7 @@
                         </div>
                     </form>
                 </div>
+                <div class="chat-list">Chat</div>
                 <div class="chat">
                     <ul id="chat-messages" class="message"></ul>
                     <form id="chat-form" action="" class="form">

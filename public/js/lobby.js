@@ -28,7 +28,7 @@ newRoom.addEventListener('click', function(e) {
         // allRoomInfo.push(roomInfo)
         // console.log(allRoomInfo)
 
-socket.on('lobby', async(roomId, roomInfo) => {
+socket.on('lobby', async(roomId, roomInfo, roomMember) => {
     const block = document.querySelectorAll(".block")
     for (i = 0; i<block.length; i++){
         block[i].remove();
@@ -36,12 +36,16 @@ socket.on('lobby', async(roomId, roomInfo) => {
     // for (let i=0; i<roomInfo.length; i++){
         const roomBlock = document.createElement('a')
         const roomOwner = document.createElement('div')
+        const roomMemberBlock = document.createElement('div')
         roomBlock.id = roomId;
         roomBlock.className = 'block';
         roomBlock.href = '/draw?room='+roomId;
         roomOwner.textContent = '房主：'+roomInfo[roomId];
-        roomOwner.className = 'text';
+        roomOwner.className = 'ownerText';
+        roomMemberBlock.textContent = '人數：'+ roomMember.length;
+        roomMemberBlock.className = 'memberText';
         roomBlock.appendChild(roomOwner);
+        roomBlock.appendChild(roomMemberBlock);
         wrap.appendChild(roomBlock);
     // }
 });

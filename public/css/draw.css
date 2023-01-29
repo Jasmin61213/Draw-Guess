@@ -8,6 +8,10 @@ body{
     margin: 0;
 }
 
+a{
+    text-decoration: none;
+}
+
 .content{
     display: flex;
     width: 1200px;
@@ -26,7 +30,17 @@ body{
     font-family: 'Rowdies', cursive;
     margin: 10px 0 10px 0;
     font-size: 48px;
-    color: #d3a588;
+    color: #D3A588;
+}
+.title::before {
+    content: attr(data-storke);
+}
+
+.title::before {
+    position: absolute;
+    z-index: -1;
+    -webkit-text-stroke: 5px #65524D;
+    text-stroke: 5px #65524D;
 }
 
 .pencil{
@@ -35,10 +49,13 @@ body{
 }
 
 canvas{
-    position: static;
+    position: relative;
     margin: 0 0 20px 0;
     background-color: #fff;
     border-radius: 15px;
+    border-color:#dadada;
+    border-style: solid;
+    border-width: 1.5px;
 }
 
 .start{
@@ -48,6 +65,53 @@ canvas{
     height: 480px;
     background-color: #fff;
     border-radius: 15px;
+    border-color:#dadada;
+    border-style: solid;
+    border-width: 1.5px;
+}
+
+.wait-text{
+    margin-top: 180px;
+    text-align: center;
+    font-size: 28px;
+    color: #65524D;
+}
+
+.start-button{
+    margin-top: 20px;
+    margin-left: 325px;
+    cursor: pointer;
+    width: 150px;
+    padding-top: 4px;
+    border: none;
+    border-radius: 10px;
+    /* border-width: 2px; */
+    background-color: #d3a588;
+    color: #fff;
+    height: 46px;
+    font-size: 24px;
+}
+
+.start-button:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
+}
+
+.member-list{
+    position: absolute;
+    top: 570px;
+    margin-left: 15px;
+    font-family: 'Rowdies', cursive;
+    color: #fff;
+    text-align: center;
+    font-size: 24px;
+    width: 120px;
+    height: 35px;
+    line-height: 35px;
+    background-color: #D3A588;
+    border-radius: 5px;
+    box-shadow: 1px 1px 2px  #b4b4b4;
 }
 
 .member{
@@ -57,7 +121,10 @@ canvas{
     height: 80px;
     background-color: #fff;
     border-radius: 15px;
-    padding: 10px 10px 10px 0px;
+    padding: 25px 10px 15px 0px;
+    border-color:#dadada;
+    border-style: solid;
+    border-width: 1px;
 }
 
 .memberBlock{
@@ -66,6 +133,7 @@ canvas{
     background-color: #ECE2D0;
     border-radius: 10px;
     margin-left: 20px;
+    box-shadow: 2px 2px 3px  #b4b4b4;
 }
 
 .memberName{
@@ -84,14 +152,50 @@ canvas{
     font-size: 20px;
     color: #65524D;
 }
+.guess-list{
+    z-index: 1;
+    position: absolute;
+    top: 75px;
+    margin-left: 40px;
+    font-family: 'Rowdies', cursive;
+    color: #fff;
+    text-align: center;
+    font-size: 26px;
+    width: 120px;
+    height: 35px;
+    line-height: 35px;
+    background-color: #D3A588;
+    border-radius: 5px;
+    box-shadow: 1px 1px 2px  #b4b4b4;
+}
 
 .guess{
     position: relative;
-    margin: 80px 0 20px 20px;
+    margin: 90px 0 30px 20px;
     width: 380px;
     height: 292px;
     background-color: #fff;
     border-radius: 15px;
+    border-color:#dadada;
+    border-style: solid;
+    border-width: 1.5px;
+}
+
+.chat-list{
+    z-index: 1;
+    position: absolute;
+    top: 400px;
+    margin-left: 40px;
+    font-family: 'Rowdies', cursive;
+    color: #fff;
+    text-align: center;
+    font-size: 26px;
+    width: 120px;
+    height: 35px;
+    line-height: 35px;
+    background-color: #D3A588;
+    border-radius: 5px;
+    box-shadow: 1px 1px 2px  #b4b4b4;
 }
 
 .chat{
@@ -101,6 +205,9 @@ canvas{
     height: 292px;
     background-color: #fff;
     border-radius: 15px;
+    border-color:#dadada;
+    border-style: solid;
+    border-width: 1.5px;
 }
 
 .form{
@@ -145,12 +252,17 @@ input:focus{
     height: 36px;
     font-size: 16px;
 }
+.button:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
+}
 
 .message{
     list-style-type: none;
     margin: 0 10px 0 10px;
-    padding: 10px;
-    height: 230px;
+    padding: 25px 10px 10px 10px;
+    height: 215px;
     overflow:auto;
 }
 

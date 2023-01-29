@@ -9,6 +9,7 @@ fetch('/getLogin')
     if (res.ok == true){
         user = res.user;
     };
+
 });
 // console.log(user)
 
@@ -34,7 +35,15 @@ socket.emit('join-room', roomId);
 //題目
 const topic = ['烏龜','貓','狗','兔子']
 
+//開始遊戲
+const startGame = document.querySelector('.start-button')
+const startBlock = document.querySelector('.start')
+startGame.addEventListener('click', function(e) {
+    startBlock.style.display = 'none'
+    socket.on('beginGame',() => {
 
+    })
+});
 
 //成員列表
 const memberWrap = document.querySelector('.member')
@@ -67,7 +76,7 @@ const ctx = canvas.getContext("2d");
 let isDrawing = false; 
 let lastX = 0;
 let lastY = 0;
-ctx.strokeStyle = "#1A090D"; // 畫筆顏色
+ctx.strokeStyle = "#65524D"; // 畫筆顏色
 ctx.lineWidth = 4;
 ctx.lineJoin = "round"; // 畫筆圓角
 ctx.lineCap = "round"; // 畫筆圓角

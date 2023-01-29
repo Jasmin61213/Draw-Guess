@@ -120,7 +120,7 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('member', roomMember[roomId]);
         io.to(roomId).emit('score', roomScore);
         // io.emit('lobby', allRoomId, allRoomInfo);
-        io.emit('lobby', roomId, roomInfo);
+        io.emit('lobby', roomId, roomInfo, roomMember[roomId]);
     });
 
     socket.on("disconnect", () => {
@@ -130,7 +130,10 @@ io.on('connection', (socket) => {
             roomMember[leaveRoomId].splice(index, 1);
             };
         };
-        console.log(roomMember[leaveRoomId])
+        // if (roomMember[leaveRoomId].length == 0){
+
+        // }
+        // console.log(roomMember[leaveRoomId])
         // if (roomMember[leaveRoomId].length == []){
             //     io.emit('deleteRoom', leaveRoomId);
             // }

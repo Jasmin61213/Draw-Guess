@@ -15,6 +15,16 @@ body{
     color: #d3a588;
     text-align: center;
 }
+.title::before {
+    content: attr(data-storke);
+}
+
+.title::before {
+    position: absolute;
+    z-index: -1;
+    -webkit-text-stroke: 9px #65524D;
+    text-stroke: 9px #65524D;
+}
 
 .pencil{
     margin-left: 10px;
@@ -30,6 +40,9 @@ body{
     margin: 0px auto;
     background-color: #fff;
     border-radius: 15px;
+    border-color:#dadada;
+    border-style: solid;
+    border-width: 1.5px;
 }
 
 .wrap{
@@ -90,4 +103,9 @@ input:focus{
     color: #fff;
     height: 36px;
     font-size: 20px;
+}
+.button:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
 }

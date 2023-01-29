@@ -19,6 +19,16 @@ a{
     color: #d3a588;
     text-align: center;
 }
+.title::before {
+    content: attr(data-storke);
+}
+
+.title::before {
+    position: absolute;
+    z-index: -1;
+    -webkit-text-stroke: 9px #65524D;
+    text-stroke: 9px #65524D;
+}
 
 .wrap-all{
     /* display: flex;
@@ -29,6 +39,9 @@ a{
     margin: 0px auto;
     background-color: #fff;
     border-radius: 15px;
+    border-color:#dadada;
+    border-style: solid;
+    border-width: 1.5px;
 }
 
 .title-text{
@@ -51,6 +64,7 @@ a{
     cursor: pointer;
     background-color: #ece2d0;
     border-radius: 15px;
+    box-shadow: 2px 2px 3px  #b4b4b4;
 }
 
 .button{
@@ -67,9 +81,29 @@ a{
     font-size: 22px;
 }
 
+.button:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
+}
+
 .text{
     text-align: center;
     font-size: 24px;
     color: #65524D;
     padding: 20px 0 15px 0;
+}
+
+.ownerText{
+    text-align: center;
+    font-size: 24px;
+    color: #65524D;
+    padding: 30px 0 15px 0;
+}
+
+.memberText{
+    text-align: center;
+    font-size: 24px;
+    color: #65524D;
+    padding: 10px 0 15px 0;
 }

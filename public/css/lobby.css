@@ -52,15 +52,22 @@ a{
 }
 
 .wrap{
-    margin-left: 20px;
+    width: 765px;
+    height: 355px;
+    margin-left: 19px;
     display: grid;
     grid-template-columns:repeat(3, 240px);
-    grid-template-rows: repeat(2, 160px); 
+    /* grid-template-rows: repeat(2, 160px);  */
     column-gap: 20px;
-    row-gap: 20px;
+    row-gap: 10px;
+    overflow: scroll;
 }
 
 .block{
+    /* flex-wrap: wrap; */
+    margin-bottom: 10px;
+    width: 240px;
+    height: 160px;
     cursor: pointer;
     background-color: #ece2d0;
     border-radius: 15px;
@@ -68,7 +75,7 @@ a{
 }
 
 .button{
-    margin: 25px 0 0 325px;
+    margin: 15px 0 0 325px;
     cursor: pointer;
     width: 180px;
     /* padding-top: 4px; */

@@ -19,7 +19,7 @@ const sessionMiddleware = session({
 });
 
 const { Server } = require("socket.io");
-const { createDiffieHellmanGroup } = require('crypto');
+// const { createDiffieHellmanGroup } = require('crypto');
 const io = new Server(server);
 
 app.set('view engine', 'ejs');
@@ -65,8 +65,8 @@ const wrap = middleware => (socket, next) => middleware(socket.request, {}, next
 io.use(wrap(sessionMiddleware));
 
 // const players = [];
-// const allRoomInfo = [];
 // const allRoomId = [];
+// const allRoomInfo = [];
 const roomInfo = {};
 const roomMember = {};
 const roomScore = {};
@@ -83,7 +83,11 @@ io.on('connection', (socket) => {
     const leaveRoomId = url.split('=')[1];
 
     //房間
-    socket.on('join-room', (roomId) =>{
+    socket.on('getRoom',() => {
+        io.emit('lobby', roomInfo, roomMember);
+    })
+
+    socket.on('join-room', (roomId) => {
         socket.join(roomId);
         if (!roomMember[roomId]){
             roomMember[roomId] = [];
@@ -120,18 +124,25 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('member', roomMember[roomId]);
         io.to(roomId).emit('score', roomScore);
         // io.emit('lobby', allRoomId, allRoomInfo);
-        io.emit('lobby', roomId, roomInfo, roomMember[roomId]);
+        // io.emit('lobby', roomId, roomInfo, roomMember);
+        io.emit('lobby', roomInfo, roomMember);
     });
 
     socket.on("disconnect", () => {
-        if (roomMember[leaveRoomId] != undefined){
+        if (typeof(roomMember[leaveRoomId]) != 'undefined'){
             const index = roomMember[leaveRoomId].indexOf(userName);
             if (index !== -1) {
             roomMember[leaveRoomId].splice(index, 1);
             };
         };
-        // if (roomMember[leaveRoomId].length == 0){
-
+        if (typeof(roomMember[leaveRoomId]) != 'undefined'){
+            if (roomMember[leaveRoomId].length == 0){
+                delete roomInfo[leaveRoomId];
+                delete roomMember[leaveRoomId];
+            };
+        };
+        // if ( typeof(leaveRoomId) != 'undefined'){
+        //     console.log(roomInfo)
         // }
         // console.log(roomMember[leaveRoomId])
         // if (roomMember[leaveRoomId].length == []){
@@ -158,7 +169,9 @@ io.on('connection', (socket) => {
         io.to(leaveRoomId).emit('leaveRoom', `${userName}離開了！`);
         io.to(leaveRoomId).emit('member', roomMember[leaveRoomId]);
         io.to(leaveRoomId).emit('score', roomScore);
+        io.emit('lobby', roomInfo, roomMember);
         // io.emit('lobby', leaveRoomId, allRoomInfo);
+        // io.emit('lobby', leaveRoomId, roomInfo, roomMember);
     });
 
     // socket.on('getScore',(roomId) => {

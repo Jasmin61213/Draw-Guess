@@ -58,6 +58,13 @@ canvas{
     border-width: 1.5px;
 }
 
+.look{
+    position: absolute;
+    top: 80px;
+    width: 800px;
+    height: 480px;
+}
+
 .start{
     position: absolute;
     top: 80px;
@@ -70,14 +77,23 @@ canvas{
     border-width: 1.5px;
 }
 
-.wait-text{
+.wait-text-host{
+    display: none;
     margin-top: 180px;
     text-align: center;
     font-size: 28px;
     color: #65524D;
 }
 
+.wait-text{
+    margin-top: 210px;
+    text-align: center;
+    font-size: 28px;
+    color: #65524D;
+}
+
 .start-button{
+    display: none;
     margin-top: 20px;
     margin-left: 325px;
     cursor: pointer;
@@ -125,9 +141,12 @@ canvas{
     border-color:#dadada;
     border-style: solid;
     border-width: 1px;
+    overflow: auto;
 }
 
 .memberBlock{
+    display: flex;
+    flex: none;
     width: 175px;
     height: 80px;
     background-color: #ECE2D0;
@@ -136,11 +155,25 @@ canvas{
     box-shadow: 2px 2px 3px  #b4b4b4;
 }
 
+.left{
+    flex: none;
+}
+
+.right{
+    flex: none;
+}
+
+.memberPic{
+    margin: 20px 13px 0 15px;
+    width: 40px;
+    height: 40px;
+}
+
 .memberName{
     font-family: 'Rowdies', cursive;
     /* font-family: 'Noto Sans TC', sans-serif; */
     text-align: center;
-    margin: 8px 0 0 50px;
+    margin: 8px 0 0 0px;
     font-size: 24px;
     color: #65524D;
 }
@@ -148,7 +181,7 @@ canvas{
 .memberScore{
     font-family: 'Rowdies', cursive;
     text-align: center;
-    margin: 5px 0 0 50px;
+    margin: 5px 0 0 0px;
     font-size: 20px;
     color: #65524D;
 }

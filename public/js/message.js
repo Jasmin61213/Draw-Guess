@@ -6,20 +6,36 @@ const chatMessages = document.getElementById('chat-messages');
 const chatForm = document.getElementById('chat-form');
 const chatInput = document.getElementById('chat-input');
 
-// const answer = '烏龜'
+// let topic;
+// socket.emit('topic', roomId)
+// socket.on('topic', (topic1) => {
+//     topic = topic1;
+//     console.log(topic)
+// });
 
-guessForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    // if (guessInput.value){
-        // if (guessInput.value == answer){
-        //     // socket.emit('guess', '恭喜答對了！', roomId);
-        //     guessInput.value = '';
-        // }else{
-            socket.emit('guess', guessInput.value, roomId);
-            guessInput.value = '';
-        // };
-    // };
-});
+async function login(){
+    const response = await fetch('/getLogin');
+    const res = await response.json();
+    if (res.ok == true){
+        user = res.user;
+
+    // socket.on('topic', (topic) => {
+    guessForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log(topic)
+        if (guessInput.value){
+            // socket.on('topic', (topic) => {
+            if (guessInput.value == topic){
+                socket.emit('win', roomId, user)
+                // socket.emit('guess', '恭喜答對了！', roomId);
+                guessInput.value = '';
+            }else{
+                socket.emit('guess', guessInput.value, roomId);
+                guessInput.value = '';
+            };
+            // });
+        };
+    });
 
 socket.on('guess', function(msg, userName) {
     const guessItem = document.createElement('li');
@@ -60,3 +76,7 @@ socket.on('leaveRoom',function(data) {
     chatMessages.appendChild(roomItem);
     chatMessages.scrollTo(0, chatMessages.scrollHeight);
 });
+
+};
+};
+login();

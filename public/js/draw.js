@@ -1,49 +1,103 @@
-let user;
-
-//驗證登入者
-fetch('/getLogin')
-.then(function(response){
-    return response.json()
-})
-.then(function(res){
-    if (res.ok == true){
-        user = res.user;
-    };
-
-});
-// console.log(user)
-
-//socket
 const socket = io();
 
+const guessMessages = document.getElementById('guess-messages');
+const guessForm = document.getElementById('guess-form');
+const guessInput = document.getElementById('guess-input');
+
+const chatMessages = document.getElementById('chat-messages');
+const chatForm = document.getElementById('chat-form');
+const chatInput = document.getElementById('chat-input');
+
+//加入房間
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get('room');
 socket.emit('join-room', roomId);
-// socket.emit('roomInfo')
-// socket.on('roomInfo', (roomInfo) => {
-//     socket.emit('roomInfo', roomInfo)
-// });
-// socket.on('allRoomInfo', (roomId, allRoomInfo) => {
-    
-// });
 
-//跳出框
-// function remind(){
+let user;
+//驗證登入者
+async function login(){
+    const response = await fetch('/getLogin');
+    const res = await response.json();
+    if (res.ok == true){
+        user = res.user;
 
-// }
+//遊戲流程
+const startGame = document.querySelector('.start-button');
+const waitTextHost = document.querySelector('.wait-text-host');
+const waitText = document.querySelector('.wait-text');
+const startBlock = document.querySelector('.start');
+const look = document.querySelector('.look');
 
-//題目
-const topic = ['烏龜','貓','狗','兔子']
-
-//開始遊戲
-const startGame = document.querySelector('.start-button')
-const startBlock = document.querySelector('.start')
-startGame.addEventListener('click', function(e) {
-    startBlock.style.display = 'none'
-    socket.on('beginGame',() => {
-
-    })
+socket.emit('roomStatus', roomId);
+socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic) => {
+    console.log(roomInfo, roomMember, roomRound, thisRoomTopic);
+    if (roomInfo == 'waiting'){
+        if (user == roomMember[0]){
+        startGame.style.display = 'block';
+        waitTextHost.style.display = 'block';
+        waitText.style.display = 'none';
+        };
+    };
+    if (roomInfo == 'playing'){
+        topic = thisRoomTopic;
+        startBlock.style.display = 'none';
+        const img = document.querySelectorAll('.memberPic');
+        for (let i =0; i<img.length; i++){
+            img[i].src = '/image/pencillittle.png'
+        }
+        img[roomRound].src = '/image/pencilbrown.png';
+        if (user == roomMember[roomRound]){
+            look.style.display = 'none';
+            const guessItem = document.createElement('li');
+            guessItem.className = 'li';
+            guessItem.textContent = '輪到你了！題目是' + topic;
+            guessMessages.appendChild(guessItem);
+            guessMessages.scrollTo(0, guessMessages.scrollHeight);
+        }else{
+            look.style.display = 'block';
+        };
+    };
 });
+
+let topic;
+//房主按下按鈕開始遊戲，更改遊戲狀態
+startGame.addEventListener('click', function(e) {
+    socket.emit('beginGame', roomId);
+    // let topic;
+    // socket.emit('topic', roomId)
+    // socket.on('topic', (thisRoomTopic) => {
+    //     topic = thisRoomTopic;
+    // });
+});
+
+socket.on('winScore', (roomScore, user) => {
+    const score = document.getElementById(user);
+    score.textContent = 'Score：' + roomScore;
+    // topic = thisRoomTopic;
+})
+
+// socket.on('topic', function(msg) {
+//     const guessItem = document.createElement('li');
+//     guessItem.className = 'li'
+//     guessItem.textContent = msg;
+//     guessMessages.appendChild(guessItem);
+//     guessMessages.scrollTo(0, guessMessages.scrollHeight);
+// });
+
+//接收開始遊戲訊息
+// socket.on('beginGame',(roomInfo, roomMember, roomRound, topic) => {
+//         startBlock.style.display = 'none';
+//         const img = document.querySelectorAll('.memberPic');
+//         img[roomRound].src = '/image/pencilbrown.png';
+//         if (user == roomMember[roomRound]){
+//             look.style.display = 'none';
+//             const guessItem = document.createElement('li');
+//             guessItem.className = 'li';
+//             guessItem.textContent = '輪到你了！題目是' + topic;
+//             guessMessages.appendChild(guessItem);
+//             guessMessages.scrollTo(0, guessMessages.scrollHeight);
+//         };
+// });
 
 //成員列表
 const memberWrap = document.querySelector('.member')
@@ -56,15 +110,26 @@ socket.on('member',(member) =>{
         for (let i=0; i<member.length; i++){
             const memberBlock = document.createElement('div');
             memberBlock.className = 'memberBlock';
+            const left = document.createElement('div');
+            left.className = 'left';
+            const img = document.createElement('img');
+            img.src = '/image/pencillittle.png';
+            img.className = 'memberPic';
+            const right = document.createElement('div');
+            right.className = 'right';
             const memberName = document.createElement('div');
-            memberName.className = 'memberName'
-            memberName.textContent = member[i]
+            memberName.className = 'memberName';
+            memberName.textContent = member[i];
             const memberScore = document.createElement('div');
-            memberScore.className = 'memberScore'
-            memberScore.textContent = 'Score：' + score[member[i]]
-            memberBlock.appendChild(memberName)
-            memberBlock.appendChild(memberScore)
-            memberWrap.appendChild(memberBlock)
+            memberScore.className = 'memberScore';
+            memberScore.id = member[i];
+            memberScore.textContent = 'Score：' + score[member[i]];
+            left.appendChild(img)
+            right.appendChild(memberName);
+            right.appendChild(memberScore);
+            memberBlock.appendChild(left);
+            memberBlock.appendChild(right);
+            memberWrap.appendChild(memberBlock);
         };
     });
 });
@@ -145,3 +210,75 @@ socket.on('endDraw', function(){
 	isDrawing = false;
 	ctx.closePath();
 });
+
+guessForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    // console.log(topic)
+    if (guessInput.value){
+        // socket.on('topic', (topic) => {
+        if (guessInput.value == topic){
+            socket.emit('win', roomId, user)
+            // socket.emit('guess', '恭喜答對了！', roomId);
+            guessInput.value = '';
+        }else{
+            socket.emit('guess', guessInput.value, roomId);
+            guessInput.value = '';
+        };
+        // });
+    };
+});
+
+socket.on('guess', function(msg, userName) {
+const guessItem = document.createElement('li');
+guessItem.className = 'li'
+guessItem.textContent = userName + '猜' + msg;
+guessMessages.appendChild(guessItem);
+guessMessages.scrollTo(0, guessMessages.scrollHeight);
+});
+
+socket.on('winMessage', (user) => {
+    const guessItem = document.createElement('li');
+    guessItem.className = 'li'
+    guessItem.textContent = '恭喜' + user + '猜對了';
+    guessMessages.appendChild(guessItem);
+    guessMessages.scrollTo(0, guessMessages.scrollHeight);
+});
+
+chatForm.addEventListener('submit', function(e) {
+e.preventDefault();
+if (chatInput.value){
+    socket.emit('chat', chatInput.value, roomId);
+    chatInput.value = '';
+}
+});
+
+socket.on('chat', function(msg, userName) {
+const chatItem = document.createElement('li');
+chatItem.className = 'li'
+chatItem.textContent = userName +'：'+ msg;
+chatMessages.appendChild(chatItem);
+chatMessages.scrollTo(0, chatMessages.scrollHeight);
+});
+
+socket.on('connectToRoom',function(data) {
+const roomItem = document.createElement('li');
+roomItem.className = 'li'
+roomItem.textContent = data;
+chatMessages.appendChild(roomItem);
+chatMessages.scrollTo(0, chatMessages.scrollHeight);
+});
+
+socket.on('leaveRoom',function(data) {
+const roomItem = document.createElement('li');
+roomItem.className = 'li'
+roomItem.textContent = data;
+chatMessages.appendChild(roomItem);
+chatMessages.scrollTo(0, chatMessages.scrollHeight);
+});
+
+
+
+
+};
+};
+login();

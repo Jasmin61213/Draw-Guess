@@ -29,12 +29,11 @@ function game(){
     const topicDiv = document.querySelector('.topic');
     const time = document.querySelector('.bar')
     let topic;
-    // let isRoundChange = false;
     let timerId;
 
     socket.emit('roomStatus', roomId);
     socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic, roundChange) => {
-        console.log(roomInfo, roomMember, roomRound, thisRoomTopic);
+        console.log(roomInfo, roomMember, roomRound, thisRoomTopic, roundChange);
         if (roomInfo == 'waiting'){
             if (user == roomMember[0]){
             startGame.style.display = 'block';
@@ -61,14 +60,17 @@ function game(){
                 };
                 let count = 100;
                 let min = 1/60;
+                // let min = 0.1;
                 function timer() {
                     count -= min;
-                    if (count <= 0) {
+                    if (-0.09 < count < 0) {
                         socket.emit('nextRound', roomId);
-                        socket.emit('stopTime', roomId)
+                        clearInterval(timerId);
+                        count = 100;
                     }
                     socket.on('stopTime', () => {
                         clearInterval(timerId);
+                        count = 100;
                     });
                     time.style.width = count + '%';
                     socket.emit('getTime', roomId, count);
@@ -228,12 +230,13 @@ function game(){
     guessForm.addEventListener('submit', (e) => {
         e.preventDefault();
         if (guessInput.value){
+            socket.emit('guess', guessInput.value, roomId);
             if (guessInput.value == topic){
                 socket.emit('stopTime', roomId)
                 socket.emit('win', roomId, user);
                 guessInput.value = '';
             }else{
-                socket.emit('guess', guessInput.value, roomId);
+                // socket.emit('guess', guessInput.value, roomId);
                 guessInput.value = '';
             };
         };
@@ -286,18 +289,4 @@ function game(){
         chatMessages.appendChild(roomItem);
         chatMessages.scrollTo(0, chatMessages.scrollHeight);
     });
-
-    // const timerId = setInterval(timer, 10);
-    // let count = 100;
-    // const time = document.querySelector('.bar')
- 
-    // function timer() {
-    //     count -= 0.02; // 每次執行timer就把count減1。
-    //     time.style.width = count + '%';
-    //     // 若已計數完畢，則停止計時。
-    //     if (count == 0) {
-    //         clearInterval(timerId);
-    //         count = 100;
-    //     };
-    // };
 };

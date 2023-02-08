@@ -30,32 +30,56 @@ function game(){
     const time = document.querySelector('.bar')
     let topic;
     let timerId;
+    // let count;
+
+    function clearCanvas(){  
+        canvas.height=canvas.height; 
+        ctx.strokeStyle = "#65524D";
+        ctx.lineWidth = 4;
+        ctx.lineJoin = "round";
+        ctx.lineCap = "round"; 
+    }  
 
     socket.emit('roomStatus', roomId);
     socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic, roundChange) => {
         console.log(roomInfo, roomMember, roomRound, thisRoomTopic, roundChange);
         if (roomInfo == 'waiting'){
+            guessInput.setAttribute('disabled', 'disabled') 
+            guessInput.style.cursor = 'not-allowed';
             if (user == roomMember[0]){
-            startGame.style.display = 'block';
-            waitTextHost.style.display = 'block';
-            waitText.style.display = 'none';
+                console.log('o')
+                clearInterval(timerId);
+                let count = 100;
+                time.style.width = count + '%';
+                startBlock.style.display = 'block'
+                startGame.style.display = 'none';
+                waitTextHost.style.display = 'block';
+                waitText.style.display = 'none';
+                if (roomMember.length != 1){
+                    startGame.style.display = 'block';
+                }
             };
         };
         if (roomInfo == 'playing'){
+            if (roundChange){
+                guessInput.value = '';
+                clearCanvas();
+            }
             topic = thisRoomTopic;
             startBlock.style.display = 'none';
             const img = document.querySelectorAll('.memberPic');
             for (let i =0; i<img.length; i++){
-                img[i].src = '/image/pencillittle.png'
+                img[i].src = '/image/pencillittle.png';
             }
             img[roomRound].src = '/image/pencilbrown.png';
             if (user == roomMember[roomRound]){
                 look.style.display = 'none';
                 topicDiv.textContent = '題目：' + topic;
                 topicDiv.style.display = 'block';
-                guessInput.setAttribute('disabled', 'disabled') 
+                guessInput.setAttribute('disabled', 'disabled'); 
                 guessInput.style.cursor = 'not-allowed';
                 if (roundChange){
+                    socket.emit('nextDraw', roomId);
                     timerId = setInterval(timer, 10);
                 };
                 let count = 100;
@@ -63,8 +87,10 @@ function game(){
                 // let min = 0.1;
                 function timer() {
                     count -= min;
-                    if (-0.09 < count < 0) {
+                    // console.log(count)
+                    if (count <= 0) {
                         socket.emit('nextRound', roomId);
+                        socket.emit('lose', roomId);
                         clearInterval(timerId);
                         count = 100;
                     }
@@ -78,7 +104,7 @@ function game(){
             }else{
                 look.style.display = 'block';
                 topicDiv.style.display = 'none';
-                guessInput.removeAttribute('disabled', 'disabled')
+                guessInput.removeAttribute('disabled', 'disabled');
                 guessInput.style.cursor = 'auto';
                 socket.on('getTime', (roomTime) => {
                     time.style.width = roomTime + '%';
@@ -89,20 +115,18 @@ function game(){
 
     //房主按下按鈕開始遊戲，更改遊戲狀態
     startGame.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('click')
         socket.emit('beginGame', roomId);
+        startGame.style.display = 'none';
     });
 
     // 遊戲勝利處理流程
-    socket.on('winScore', (roomScore, user) => {
-        const score = document.getElementById(user);
-        score.textContent = 'Score：' + roomScore;
-        function clearCanvas(){  
-            canvas.height=canvas.height; 
-            ctx.strokeStyle = "#65524D";
-            ctx.lineWidth = 4;
-            ctx.lineJoin = "round";
-            ctx.lineCap = "round"; 
-        }  
+    socket.on('winScore', (win, winUser, draw, drawUser) => {
+        const winScore = document.getElementById(winUser);
+        winScore.textContent = 'Score：' + win;
+        const drawScore = document.getElementById(drawUser);
+        drawScore.textContent = 'Score：' + draw;
         clearCanvas();
     });
 
@@ -234,20 +258,35 @@ function game(){
             if (guessInput.value == topic){
                 socket.emit('stopTime', roomId)
                 socket.emit('win', roomId, user);
-                guessInput.value = '';
+                // guessInput.value = '';
             }else{
-                // socket.emit('guess', guessInput.value, roomId);
-                guessInput.value = '';
+                guessInput.value = '';ㄋㄋ
             };
         };
     });
 
+    socket.on('nextDraw', (userName) => {
+        const guessItem = document.createElement('li');
+        guessItem.className = 'li'
+        guessItem.textContent = `這回合輪到${userName}！`;
+        guessMessages.appendChild(guessItem);
+        guessMessages.scrollTo(0, guessMessages.scrollHeight);
+    });
+
+    socket.on('lose', () => {
+        const guessItem = document.createElement('li');
+        guessItem.className = 'li'
+        guessItem.textContent = '時間到！沒有人猜對';
+        guessMessages.appendChild(guessItem);
+        guessMessages.scrollTo(0, guessMessages.scrollHeight);
+    });
+
     socket.on('guess', (msg, userName) => {
-    const guessItem = document.createElement('li');
-    guessItem.className = 'li'
-    guessItem.textContent = userName + '猜：' + msg;
-    guessMessages.appendChild(guessItem);
-    guessMessages.scrollTo(0, guessMessages.scrollHeight);
+        const guessItem = document.createElement('li');
+        guessItem.className = 'li'
+        guessItem.textContent = userName + '猜：' + msg;
+        guessMessages.appendChild(guessItem);
+        guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
 
     chatForm.addEventListener('submit', (e) => {

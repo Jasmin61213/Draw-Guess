@@ -31,11 +31,16 @@ socket.on('lobby', async(roomInfo, roomMember) => {
         const roomOwner = document.createElement('div');
         const roomMemberBlock = document.createElement('div');
         roomBlock.className = 'block';
-        roomBlock.href = '/draw?room='+allRoomId[i];
+        if (allRoomMember[i].length == 4){
+            roomMemberBlock.textContent = '額滿';
+            roomMemberBlock.className = 'memberText';
+        }else{
+            roomMemberBlock.textContent = '人數：'+ allRoomMember[i].length;
+            roomMemberBlock.className = 'memberText';
+            roomBlock.href = '/draw?room='+allRoomId[i];
+        }
         roomOwner.textContent = '房主：'+allRoomMember[i][0];
         roomOwner.className = 'ownerText';
-        roomMemberBlock.textContent = '人數：'+ allRoomMember[i].length;
-        roomMemberBlock.className = 'memberText';
         roomBlock.appendChild(roomOwner);
         roomBlock.appendChild(roomMemberBlock);
         wrap.appendChild(roomBlock);

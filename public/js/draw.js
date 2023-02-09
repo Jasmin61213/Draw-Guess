@@ -27,31 +27,25 @@ function game(){
     const startBlock = document.querySelector('.start');
     const look = document.querySelector('.look');
     const topicDiv = document.querySelector('.topic');
-    const time = document.querySelector('.bar')
+    const time = document.querySelector('.bar');
+    const penChanged = document.querySelector('.pen');
     let topic;
     let timerId;
     // let count;
-
-    function clearCanvas(){  
-        canvas.height=canvas.height; 
-        ctx.strokeStyle = "#65524D";
-        ctx.lineWidth = 4;
-        ctx.lineJoin = "round";
-        ctx.lineCap = "round"; 
-    }  
 
     socket.emit('roomStatus', roomId);
     socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic, roundChange) => {
         console.log(roomInfo, roomMember, roomRound, thisRoomTopic, roundChange);
         if (roomInfo == 'waiting'){
+            penChanged.style.display = 'none';
             guessInput.setAttribute('disabled', 'disabled') 
             guessInput.style.cursor = 'not-allowed';
             if (user == roomMember[0]){
-                console.log('o')
                 clearInterval(timerId);
                 let count = 100;
                 time.style.width = count + '%';
-                startBlock.style.display = 'block'
+                startBlock.style.display = 'block';
+                // startGame.style.display = 'block';
                 startGame.style.display = 'none';
                 waitTextHost.style.display = 'block';
                 waitText.style.display = 'none';
@@ -69,10 +63,11 @@ function game(){
             startBlock.style.display = 'none';
             const img = document.querySelectorAll('.memberPic');
             for (let i =0; i<img.length; i++){
-                img[i].src = '/image/pencillittle.png';
+                img[i].src = '/image/pencillittle-r.png';
             }
             img[roomRound].src = '/image/pencilbrown.png';
             if (user == roomMember[roomRound]){
+                penChanged.style.display = 'block';
                 look.style.display = 'none';
                 topicDiv.textContent = '題目：' + topic;
                 topicDiv.style.display = 'block';
@@ -87,21 +82,21 @@ function game(){
                 // let min = 0.1;
                 function timer() {
                     count -= min;
-                    // console.log(count)
                     if (count <= 0) {
                         socket.emit('nextRound', roomId);
                         socket.emit('lose', roomId);
                         clearInterval(timerId);
-                        count = 100;
+                        // count = 100;
                     }
                     socket.on('stopTime', () => {
                         clearInterval(timerId);
-                        count = 100;
+                        // count = 100;
                     });
                     time.style.width = count + '%';
                     socket.emit('getTime', roomId, count);
                 };
             }else{
+                penChanged.style.display = 'none';
                 look.style.display = 'block';
                 topicDiv.style.display = 'none';
                 guessInput.removeAttribute('disabled', 'disabled');
@@ -144,7 +139,7 @@ function game(){
                 const left = document.createElement('div');
                 left.className = 'left';
                 const img = document.createElement('img');
-                img.src = '/image/pencillittle.png';
+                img.src = '/image/pencillittle-r.png';
                 img.className = 'memberPic';
                 const right = document.createElement('div');
                 right.className = 'right';
@@ -165,83 +160,6 @@ function game(){
         });
     });
 
-    //canvas
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext("2d");
-    //設定滑鼠座標(0,0)
-    let isDrawing = false; 
-    let lastX = 0;
-    let lastY = 0;
-    ctx.strokeStyle = "#65524D"; // 畫筆顏色
-    ctx.lineWidth = 4;
-    ctx.lineJoin = "round"; // 畫筆圓角
-    ctx.lineCap = "round"; // 畫筆圓角
-
-    //點按滑鼠更新座標
-    canvas.addEventListener('pointerdown', function(obj){
-        isDrawing = true;
-        [lastX, lastY] = [obj.offsetX, obj.offsetY];
-        // 按下滑鼠傳送座標
-        socket.emit('beginDraw',
-        {
-            'x':obj.offsetX,
-            'y':obj.offsetY
-        }, roomId)
-    });
-
-    //移動滑鼠開始畫畫
-    canvas.addEventListener('pointermove', function(obj){
-        if(!isDrawing){
-            return
-        };
-        ctx.beginPath(); //路徑開始
-        ctx.moveTo(lastX, lastY); //移動路徑
-        ctx.lineTo(obj.offsetX, obj.offsetY); //畫出路徑
-        ctx.stroke();
-        // ctx.save();
-        ctx.closePath();
-        [lastX, lastY] = [obj.offsetX, obj.offsetY]; //更新座標
-        // 傳送畫筆路徑
-        socket.emit('draw',
-        {
-            'x':obj.offsetX,
-            'y':obj.offsetY
-        }, roomId)
-    });
-
-    //當滑鼠放開時，停止畫畫
-    canvas.addEventListener("pointerup", function(){
-        isDrawing = false;
-        socket.emit('endDraw', roomId)
-    });
-
-    //當滑鼠離開畫布時，停止畫畫
-    canvas.addEventListener("pointerout", function(){
-        isDrawing = false;
-        socket.emit('endDraw', roomId)
-    });
-
-    // 接收畫畫開始座標
-    socket.on('beginDraw', function(point){
-        ctx.beginPath();
-        ctx.moveTo(point.x, point.y);
-        [lastX, lastY] = [point.x, point.y];
-    });
-
-    // 接收畫筆路徑，並更新座標
-    socket.on('draw', function(point){
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(point.x, point.y);
-        ctx.stroke();
-        [lastX, lastY] = [point.x, point.y];
-    });
-
-    // 接收結束畫畫
-    socket.on('endDraw', function(){
-        isDrawing = false;
-        ctx.closePath();
-    });
-
     // message
     const guessMessages = document.getElementById('guess-messages');
     const guessForm = document.getElementById('guess-form');
@@ -256,11 +174,13 @@ function game(){
         if (guessInput.value){
             socket.emit('guess', guessInput.value, roomId);
             if (guessInput.value == topic){
-                socket.emit('stopTime', roomId)
-                socket.emit('win', roomId, user);
-                // guessInput.value = '';
+                async function win(){
+                    const stopTimeSocket = await socket.emit('stopTime', roomId);
+                    const winSocket = await socket.emit('win', roomId, user);
+                }
+                win();
             }else{
-                guessInput.value = '';ㄋㄋ
+                guessInput.value = '';
             };
         };
     });

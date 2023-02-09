@@ -192,6 +192,10 @@ io.on('connection', (socket) => {
         socket.broadcast.to(roomId).emit('endDraw');
     });
 
+    socket.on('brushChanged', (roomId, color, width) => {
+        socket.broadcast.to(roomId).emit('brushChanged', color, width);
+    });
+
     //遊戲流程
     const topics = ['向日葵','蘋果','青蛙','光頭','西瓜','獅子','耳朵','皮卡丘',
         '腳踏車','鋼琴','火車','棉花糖','漢堡','翻車魚','望遠鏡','相機'];
@@ -222,6 +226,7 @@ io.on('connection', (socket) => {
                 roomRound[roomId] ++;
             };
         };
+        // io.to(roomId).emit('stopTime');
         io.to(roomId).emit('winScore', roomScore[user], user, roomScore[drawUser], drawUser);
         io.to(roomId).emit('winMessage', user);
         io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomRound[roomId], topic[roomId], roundChange[roomId]);
@@ -246,7 +251,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('stopTime', (roomId) => {
-        io.to(roomId).emit('stopTime');
+        socket.broadcast.to(roomId).emit('stopTime');
     })
 });
 

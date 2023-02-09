@@ -10,8 +10,20 @@
         <div class="content">
             <div class="left">
                 <a href='/lobby'><div class="title" data-storke="Draw & Guess">Draw & Guess<img src="/image/pencil.png" class="pencil"></div></a>
-                <div class="topic"></div>
                 <canvas id="canvas" width="800" height="480"></canvas>
+                <div class="pen">
+                    <div class="red"></div>
+                    <div class="orange"></div>
+                    <div class="yellow"></div>
+                    <div class="green"></div>
+                    <div class="blue"></div>
+                    <div class="purple"></div>
+                    <div class="pink"></div>
+                    <div class="grey"></div>
+                    <img src="/image/eraser.png" class="eraser">
+                </div>
+                <img src="/image/pen.png" class="img">
+                <div class="topic"></div>
                 <div class="look"></div>
                 <div class="start">
                     <div class="wait-text-host">等待其他玩家加入......</div>
@@ -48,6 +60,7 @@
         </div>
         <script src="/socket.io/socket.io.js"></script>
         <script src="/js/draw.js"></script>
+        <script src="/js/canvas.js"></script>
         <!-- <script src="/js/message.js"></script> -->
         <iframe id="myIframe" name="hideIframe" style="display:none;"></iframe>    
     </body>

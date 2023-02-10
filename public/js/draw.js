@@ -37,6 +37,8 @@ function game(){
     socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic, roundChange) => {
         console.log(roomInfo, roomMember, roomRound, thisRoomTopic, roundChange);
         if (roomInfo == 'waiting'){
+            topicDiv.style.display = 'none';
+            waitText.style.display = 'block';
             penChanged.style.display = 'none';
             guessInput.setAttribute('disabled', 'disabled') 
             guessInput.style.cursor = 'not-allowed';

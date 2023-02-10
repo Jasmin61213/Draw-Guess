@@ -125,6 +125,7 @@ redPen.addEventListener('click', (e) => {
     color = "#F2542D";
     width = 4;
     ctx.strokeStyle = "#F2542D";
+    ctx.lineWidth = 4;
     colorSelected(redPen)
     socket.emit('brushChanged', roomId, color, width);
 });
@@ -134,6 +135,7 @@ orangePen.addEventListener('click', (e) => {
     color = "#fe7f2d";
     width = 4;
     ctx.strokeStyle = "#fe7f2d";
+    ctx.lineWidth = 4;
     colorSelected(orangePen)
     socket.emit('brushChanged', roomId, color, width);
 });
@@ -143,6 +145,7 @@ yellowPen.addEventListener('click', (e) => {
     color = "#fcca46";
     width = 4;
     ctx.strokeStyle = "#fcca46";
+    ctx.lineWidth = 4;
     colorSelected(yellowPen)
     socket.emit('brushChanged', roomId, color, width); 
 });
@@ -152,6 +155,7 @@ greenPen.addEventListener('click', (e) => {
     color = "#a1c181";
     width = 4;
     ctx.strokeStyle = "#a1c181";
+    ctx.lineWidth = 4;
     colorSelected(greenPen)
     socket.emit('brushChanged', roomId, color, width);
 });
@@ -161,6 +165,7 @@ bluePen.addEventListener('click', (e) => {
     color = "#98c1d9";
     width = 4;
     ctx.strokeStyle = "#98c1d9";
+    ctx.lineWidth = 4;
     colorSelected(bluePen)
     socket.emit('brushChanged', roomId, color, width); 
 });
@@ -170,6 +175,7 @@ purplePen.addEventListener('click', (e) => {
     color = "#886176";
     width = 4;
     ctx.strokeStyle = "#886176";
+    ctx.lineWidth = 4;
     colorSelected(purplePen)
     socket.emit('brushChanged', roomId, color, width);
 });
@@ -179,6 +185,7 @@ pinkPen.addEventListener('click', (e) => {
     color = "#FCBFB7";
     width = 4;
     ctx.strokeStyle = "#FCBFB7";
+    ctx.lineWidth = 4;
     colorSelected(pinkPen)
     socket.emit('brushChanged', roomId, color, width);
 });
@@ -188,6 +195,7 @@ greyPen.addEventListener('click', (e) => {
     color = "#65524d";
     width = 4;
     ctx.strokeStyle = "#65524d";
+    ctx.lineWidth = 4;
     colorSelected(greyPen)
     socket.emit('brushChanged', roomId, color, width);
 });

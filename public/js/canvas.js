@@ -1,20 +1,21 @@
 //canvas
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext("2d");
+
 //設定滑鼠座標(0,0)
 let isDrawing = false; 
 let lastX = 0;
 let lastY = 0;
-ctx.strokeStyle = "#65524D"; // 畫筆顏色
-ctx.lineWidth = 4;
-ctx.lineJoin = "round"; // 畫筆圓角
-ctx.lineCap = "round"; // 畫筆圓角
+ctx.strokeStyle = "#65524D"; //畫筆顏色
+ctx.lineWidth = 4; //畫筆粗度
+ctx.lineJoin = "round"; //畫筆圓角
+ctx.lineCap = "round"; //畫筆圓角
 
 //點按滑鼠更新座標
-canvas.addEventListener('pointerdown', function(obj){
+canvas.addEventListener('pointerdown', (obj) => {
     isDrawing = true;
     [lastX, lastY] = [obj.offsetX, obj.offsetY];
-    // 按下滑鼠傳送座標
+    //按下滑鼠傳送座標
     socket.emit('beginDraw',{
         'x':obj.offsetX,
         'y':obj.offsetY
@@ -30,10 +31,9 @@ canvas.addEventListener('pointermove', (obj) => {
     ctx.moveTo(lastX, lastY); //移動路徑
     ctx.lineTo(obj.offsetX, obj.offsetY); //畫出路徑
     ctx.stroke();
-    // ctx.save();
     ctx.closePath();
     [lastX, lastY] = [obj.offsetX, obj.offsetY]; //更新座標
-    // 傳送畫筆路徑
+    //傳送畫筆路徑
     socket.emit('draw',{
         'x':obj.offsetX,
         'y':obj.offsetY
@@ -52,14 +52,14 @@ canvas.addEventListener("pointerout", () => {
     socket.emit('endDraw', roomId)
 });
 
-// 接收畫畫開始座標
+//接收畫畫開始座標
 socket.on('beginDraw', (point) => {
     ctx.beginPath();
     ctx.moveTo(point.x, point.y);
     [lastX, lastY] = [point.x, point.y];
 });
 
-// 接收畫筆路徑，並更新座標
+//接收畫筆路徑，並更新座標
 socket.on('draw', (point) => {
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(point.x, point.y);
@@ -67,7 +67,7 @@ socket.on('draw', (point) => {
     [lastX, lastY] = [point.x, point.y];
 });
 
-// 接收結束畫畫
+//接收結束畫畫
 socket.on('endDraw', () => {
     isDrawing = false;
     ctx.closePath();
@@ -110,7 +110,7 @@ function colorSelected(colorPen){
         };
         colorPens[i].style.width = '37px';
         colorPens[i].style.height = '37px';
-    }
+    };
     if (colorPen == greyPen || colorPen == purplePen){
         colorPen.style.border = '3px dashed #d3a588';
     }else{
@@ -126,7 +126,7 @@ redPen.addEventListener('click', (e) => {
     width = 4;
     ctx.strokeStyle = "#F2542D";
     ctx.lineWidth = 4;
-    colorSelected(redPen)
+    colorSelected(redPen);
     socket.emit('brushChanged', roomId, color, width);
 });
 
@@ -136,7 +136,7 @@ orangePen.addEventListener('click', (e) => {
     width = 4;
     ctx.strokeStyle = "#fe7f2d";
     ctx.lineWidth = 4;
-    colorSelected(orangePen)
+    colorSelected(orangePen);
     socket.emit('brushChanged', roomId, color, width);
 });
 
@@ -146,7 +146,7 @@ yellowPen.addEventListener('click', (e) => {
     width = 4;
     ctx.strokeStyle = "#fcca46";
     ctx.lineWidth = 4;
-    colorSelected(yellowPen)
+    colorSelected(yellowPen);
     socket.emit('brushChanged', roomId, color, width); 
 });
 
@@ -156,7 +156,7 @@ greenPen.addEventListener('click', (e) => {
     width = 4;
     ctx.strokeStyle = "#a1c181";
     ctx.lineWidth = 4;
-    colorSelected(greenPen)
+    colorSelected(greenPen);
     socket.emit('brushChanged', roomId, color, width);
 });
 
@@ -166,7 +166,7 @@ bluePen.addEventListener('click', (e) => {
     width = 4;
     ctx.strokeStyle = "#98c1d9";
     ctx.lineWidth = 4;
-    colorSelected(bluePen)
+    colorSelected(bluePen);
     socket.emit('brushChanged', roomId, color, width); 
 });
 
@@ -176,7 +176,7 @@ purplePen.addEventListener('click', (e) => {
     width = 4;
     ctx.strokeStyle = "#886176";
     ctx.lineWidth = 4;
-    colorSelected(purplePen)
+    colorSelected(purplePen);
     socket.emit('brushChanged', roomId, color, width);
 });
 
@@ -186,7 +186,7 @@ pinkPen.addEventListener('click', (e) => {
     width = 4;
     ctx.strokeStyle = "#FCBFB7";
     ctx.lineWidth = 4;
-    colorSelected(pinkPen)
+    colorSelected(pinkPen);
     socket.emit('brushChanged', roomId, color, width);
 });
 
@@ -196,7 +196,7 @@ greyPen.addEventListener('click', (e) => {
     width = 4;
     ctx.strokeStyle = "#65524d";
     ctx.lineWidth = 4;
-    colorSelected(greyPen)
+    colorSelected(greyPen);
     socket.emit('brushChanged', roomId, color, width);
 });
 
@@ -206,6 +206,6 @@ eraser.addEventListener('click', (e) => {
     width = 30;
     ctx.strokeStyle = "#fff";
     ctx.lineWidth = 30;
-    colorSelected(eraser)
+    colorSelected(eraser);
     socket.emit('brushChanged', roomId, color, width);
 });

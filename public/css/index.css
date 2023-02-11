@@ -58,8 +58,9 @@ body{
 }
 
 .member{
-    margin-top: 60px;
-    margin-left: 50px;
+    margin: 60px 0 25px 50px;
+    /* margin-top: 30px;
+    margin-left: 50px; */
     width: 220px;
 }
 
@@ -71,6 +72,7 @@ body{
 
 .input-div{
     display: flex;
+    margin-bottom: 20px;
 }
 
 .input{

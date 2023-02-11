@@ -31,7 +31,6 @@ function game(){
     const penChanged = document.querySelector('.pen');
     let topic;
     let timerId;
-    // let count;
 
     socket.emit('roomStatus', roomId);
     socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic, roundChange) => {
@@ -60,15 +59,23 @@ function game(){
             if (roundChange){
                 guessInput.value = '';
                 clearCanvas();
-            }
+            };
             topic = thisRoomTopic;
             startBlock.style.display = 'none';
             const img = document.querySelectorAll('.memberPic');
+            const block = document.querySelectorAll(".memberBlock");
+            const memberName = document.querySelectorAll(".memberName");
+            const memberScore = document.querySelectorAll(".memberScore");
             for (let i =0; i<img.length; i++){
-                img[i].src = '/image/pencillittle-r.png';
-            }
-            img[roomRound].src = '/image/pencilbrown.png';
+                block[i].style.backgroundColor = '#ECE2D0';
+                memberName[i].style.color = '#65524D';
+                memberScore[i].style.color = '#65524D';
+            };
+            block[roomRound].style.backgroundColor = '#9C7C6B';
+            memberName[roomRound].style.color = '#fff';
+            memberScore[roomRound].style.color = '#fff';
             if (user == roomMember[roomRound]){
+                clearCanvas();
                 penChanged.style.display = 'block';
                 look.style.display = 'none';
                 topicDiv.textContent = '題目：' + topic;
@@ -86,8 +93,9 @@ function game(){
                     count -= min;
                     if (count <= 0) {
                         socket.emit('nextRound', roomId);
-                        socket.emit('lose', roomId);
+                        socket.emit('lose', roomId, topic);
                         clearInterval(timerId);
+                        console.log(topic)
                         // count = 100;
                     }
                     socket.on('stopTime', () => {
@@ -131,7 +139,7 @@ function game(){
     const memberWrap = document.querySelector('.member')
     socket.on('member',(member) =>{
         socket.on('score', (score) => {
-            const block = document.querySelectorAll(".memberBlock")
+            const block = document.querySelectorAll(".memberBlock");
             for (i = 0; i<block.length; i++){
                 block[i].remove();
             };
@@ -195,10 +203,10 @@ function game(){
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
 
-    socket.on('lose', () => {
+    socket.on('lose', (topic) => {
         const guessItem = document.createElement('li');
         guessItem.className = 'li'
-        guessItem.textContent = '時間到！沒有人猜對';
+        guessItem.textContent = '時間到！答案是' + topic;
         guessMessages.appendChild(guessItem);
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
@@ -206,7 +214,7 @@ function game(){
     socket.on('guess', (msg, userName) => {
         const guessItem = document.createElement('li');
         guessItem.className = 'li'
-        guessItem.textContent = userName + '猜：' + msg;
+        guessItem.textContent = `${userName}猜：${msg}`;
         guessMessages.appendChild(guessItem);
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
@@ -222,7 +230,7 @@ function game(){
     socket.on('chat', (msg, userName) => {
         const chatItem = document.createElement('li');
         chatItem.className = 'li'
-        chatItem.textContent = userName +'：'+ msg;
+        chatItem.textContent = `${userName}：${msg}`;
         chatMessages.appendChild(chatItem);
         chatMessages.scrollTo(0, chatMessages.scrollHeight);
     });
@@ -230,7 +238,7 @@ function game(){
     socket.on('winMessage', (user) => {
         const guessItem = document.createElement('li');
         guessItem.className = 'li'
-        guessItem.textContent = '恭喜' + user + '猜對了！';
+        guessItem.textContent = `'恭喜${user}猜對了！`;
         guessMessages.appendChild(guessItem);
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });

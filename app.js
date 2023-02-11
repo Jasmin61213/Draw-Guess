@@ -166,8 +166,8 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('nextDraw', users[round]);
     });
 
-    socket.on('lose', (roomId) => {
-        io.to(roomId).emit('lose');
+    socket.on('lose', (roomId, topic) => {
+        io.to(roomId).emit('lose', topic);
     })
 
     //畫畫

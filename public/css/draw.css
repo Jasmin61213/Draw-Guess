@@ -25,6 +25,7 @@ a{
 
 .right{
     flex: none;
+    position: relative;
 }
 
 .title{
@@ -44,6 +45,14 @@ a{
     text-stroke: 5px #65524D;
 }
 
+.close{
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    width: 52px;
+    height: 52px;
+}
+
 .pencil{
     width:48px;
     margin-left: 10px;
@@ -57,7 +66,7 @@ a{
     position: absolute;
     width: 250px;
     height: 50px;
-    background-color: #D3A588;
+    background-color: #9C7C6B;
     border-radius: 5px;
     font-size: 26px;
     color: #fff;
@@ -385,7 +394,7 @@ canvas{
     width: 120px;
     height: 35px;
     line-height: 35px;
-    background-color: #D3A588;
+    background-color: #9C7C6B;
     border-radius: 5px;
     box-shadow: 1px 1px 2px  #b4b4b4;
 }
@@ -459,7 +468,7 @@ canvas{
     width: 120px;
     height: 35px;
     line-height: 35px;
-    background-color: #D3A588;
+    background-color: #9C7C6B;
     border-radius: 5px;
     box-shadow: 1px 1px 2px  #b4b4b4;
 }
@@ -488,7 +497,7 @@ canvas{
     width: 120px;
     height: 35px;
     line-height: 35px;
-    background-color: #D3A588;
+    background-color: #9C7C6B;
     border-radius: 5px;
     box-shadow: 1px 1px 2px  #b4b4b4;
 }

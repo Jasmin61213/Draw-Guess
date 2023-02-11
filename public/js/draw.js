@@ -35,7 +35,7 @@ function game(){
 
     socket.emit('roomStatus', roomId);
     socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic, roundChange) => {
-        console.log(roomInfo, roomMember, roomRound, thisRoomTopic, roundChange);
+        console.log(roomInfo, roomMember, roomRound, roundChange);
         if (roomInfo == 'waiting'){
             topicDiv.style.display = 'none';
             waitText.style.display = 'block';
@@ -80,8 +80,8 @@ function game(){
                     timerId = setInterval(timer, 10);
                 };
                 let count = 100;
-                let min = 1/60;
-                // let min = 0.1;
+                // let min = 1/60;
+                let min = 0.1;
                 function timer() {
                     count -= min;
                     if (count <= 0) {

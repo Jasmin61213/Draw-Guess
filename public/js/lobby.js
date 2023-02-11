@@ -31,7 +31,7 @@ socket.on('lobby', async(roomInfo, roomMember) => {
         const roomOwner = document.createElement('div');
         const roomMemberBlock = document.createElement('div');
         roomBlock.className = 'block';
-        if (allRoomMember[i].length == 4){
+        if (allRoomMember[i].length == 8){
             roomMemberBlock.textContent = '額滿';
             roomMemberBlock.className = 'memberText';
         }else{

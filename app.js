@@ -71,8 +71,18 @@ const roomInfo = {};
 const roomMember = {};
 const roomScore = {};
 const roomRound = {};
+const roomDraw = {};
 const roundChange = {};
 const topic = {};
+const topicIndex = {};
+const topics = [
+    '向日葵','蘋果','青蛙','光頭','西瓜','獅子','耳朵','皮卡丘','立可帶','警車',
+    '腳踏車','鋼琴','火車','棉花糖','漢堡','翻車魚','望遠鏡','相機','螞蟻','牛',
+    '海馬','耳機','手機','珍珠奶茶','時鐘','手錶','薯條','馬鈴薯','番茄','菠菜',
+    '大象','黑板','電風扇','國旗','口罩','枕頭','棉被','滅火器','警察','鴕鳥',
+    '企鵝','老鷹','熊貓','穿山甲','袋鼠','洗衣機','電視','太陽','拉麵','火鍋',
+];
+const topicsLength = topics.length;
 
 io.on('connection', (socket) => {
     const userName = socket.request.session.user;
@@ -86,7 +96,7 @@ io.on('connection', (socket) => {
 
     socket.on('roomStatus', (roomId) => {
         roundChange[roomId] = false;
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomRound[roomId], topic[roomId], roundChange[roomId]);
+        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
     })
 
     socket.on('join-room', (roomId) => {
@@ -106,23 +116,21 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('connectToRoom', `${userName}加入了！`);
         io.to(roomId).emit('member', roomMember[roomId]);
         io.to(roomId).emit('score', roomScore);
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomRound[roomId], topic[roomId], roundChange[roomId]);
+        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
     });
 
     socket.on("disconnect", () => {
         roundChange[leaveRoomId] = false;
         const leaveUser = roomMember[leaveRoomId];
-        const leaveRound = roomRound[leaveRoomId];
+        const leaveRound = roomDraw[leaveRoomId];
         if (typeof(roomMember[leaveRoomId]) != 'undefined'){
             if (userName == leaveUser[leaveRound]){
                 roundChange[leaveRoomId] =true;
             };
-            // console.log(roomMember[leaveRoomId])
             const index = roomMember[leaveRoomId].indexOf(userName);
             if (index !== -1) {
             roomMember[leaveRoomId].splice(index, 1);
             };
-            // console.log(roomMember[leaveRoomId].length)
             if (roomMember[leaveRoomId].length == 1){
                 roomInfo[leaveRoomId] = 'waiting';
             }
@@ -130,34 +138,17 @@ io.on('connection', (socket) => {
                 delete roomInfo[leaveRoomId];
                 delete roomMember[leaveRoomId];
                 delete roomScore[userName];
-                delete roomRound[leaveRoomId];
+                delete roomDraw[leaveRoomId];
                 delete roundChange[leaveRoomId];
                 delete topic[leaveRoomId];
             };
         };
-        // console.log(roomInfo[leaveRoomId])
-        // if (typeof(roomMember[leaveRoomId]) != 'undefined'){
-        //     const index = roomMember[leaveRoomId].indexOf(userName);
-        //     if (index !== -1) {
-        //     roomMember[leaveRoomId].splice(index, 1);
-        //     };
-        // };
-        // if (typeof(roomMember[leaveRoomId]) != 'undefined'){
-        //     if (roomMember[leaveRoomId].length == 0){
-        //         delete roomInfo[leaveRoomId];
-        //         delete roomMember[leaveRoomId];
-        //         delete roomScore[userName];
-        //         delete roomRound[leaveRoomId];
-        //         delete roundChange[leaveRoomId];
-        //         delete topic[leaveRoomId];
-        //     };
-        // };
         socket.leave(leaveRoomId); 
         io.emit('lobby', roomInfo, roomMember);
         io.to(leaveRoomId).emit('leaveRoom', `${userName}離開了！`);
         io.to(leaveRoomId).emit('member', roomMember[leaveRoomId]);
         io.to(leaveRoomId).emit('score', roomScore);
-        io.to(leaveRoomId).emit('roomStatus', roomInfo[leaveRoomId], roomMember[leaveRoomId], roomRound[leaveRoomId], topic[leaveRoomId], roundChange[leaveRoomId]);
+        io.to(leaveRoomId).emit('roomStatus', roomInfo[leaveRoomId], roomMember[leaveRoomId], roomDraw[leaveRoomId], topic[leaveRoomId], roundChange[leaveRoomId]);
     });
 
     //聊天室
@@ -171,7 +162,7 @@ io.on('connection', (socket) => {
 
     socket.on('nextDraw', (roomId) => {
         let users = roomMember[roomId];
-        let round = roomRound[roomId];
+        let round = roomDraw[roomId];
         io.to(roomId).emit('nextDraw', users[round]);
     });
 
@@ -197,53 +188,70 @@ io.on('connection', (socket) => {
     });
 
     //遊戲流程
-    const topics = ['向日葵','蘋果','青蛙','光頭','西瓜','獅子','耳朵','皮卡丘',
-        '腳踏車','鋼琴','火車','棉花糖','漢堡','翻車魚','望遠鏡','相機'];
-    const topicsLength = topics.length;
-
     socket.on('beginGame', (roomId) => {
         roundChange[roomId] = true;
+        roomRound[roomId] = 1;
         roomInfo[roomId] = 'playing';
-        roomRound[roomId] = 0;
-        const topicIndex = Math.floor(Math.random()*topicsLength);
-        topic[roomId] = topics[topicIndex];
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomRound[roomId], topic[roomId], roundChange[roomId]);
+        roomDraw[roomId] = 0;
+        if (!topicIndex[roomId]){
+            topicIndex[roomId] = [];
+        };
+        let str='';
+        topicIndex[roomId] = [];
+        for(i=0; i<topicsLength; i++){
+            str = Math.round(Math.random()*topicsLength);
+            for(j=0;j<topicIndex[roomId].length;j++){
+                    if(topicIndex[roomId][j] == str){
+                        topicIndex[roomId].splice(j,1);
+                        i--;
+                    };
+                    if(topicIndex[roomId][j] == topicsLength){
+                        topicIndex[roomId].splice(j,1);
+                    };
+                };
+            topicIndex[roomId].push(str);
+        };
+        // console.log(topicIndex[roomId])
+        let round = roomRound[roomId];
+        topic[roomId] = topics[topicIndex[roomId][round]];
+        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
     });
 
     socket.on('win', (roomId, user) => {
         roundChange[roomId] = true;
+        roomRound[roomId] ++;
         let Users = roomMember[roomId];
-        let round = roomRound[roomId];
+        let round = roomDraw[roomId];
         let drawUser = Users[round];
         roomScore[drawUser] ++;
         roomScore[user] ++;
-        const topicIndex = Math.floor(Math.random()*topicsLength);
-        topic[roomId] = topics[topicIndex];
         if (typeof(roomMember[roomId]) != 'undefined'){
-            if (roomRound[roomId]+1 == roomMember[roomId].length){
-                roomRound[roomId] = 0;
+            if (roomDraw[roomId]+1 == roomMember[roomId].length){
+                roomDraw[roomId] = 0;
             }else{
-                roomRound[roomId] ++;
+                roomDraw[roomId] ++;
             };
         };
-        // io.to(roomId).emit('stopTime');
+        let nextRound = roomRound[roomId];
+        topic[roomId] = topics[topicIndex[roomId][nextRound]];
         io.to(roomId).emit('winScore', roomScore[user], user, roomScore[drawUser], drawUser);
         io.to(roomId).emit('winMessage', user);
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomRound[roomId], topic[roomId], roundChange[roomId]);
+        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
     });
 
     socket.on('nextRound', (roomId) => {
         roundChange[roomId] = true;
-        const topicIndex = Math.floor(Math.random()*topicsLength);
-        topic[roomId] = topics[topicIndex];
+        roomRound[roomId] ++;
         if (typeof(roomMember[roomId]) != 'undefined'){
-            if (roomRound[roomId]+1 == roomMember[roomId].length){
-                roomRound[roomId] = 0;
+            if (roomDraw[roomId]+1 == roomMember[roomId].length){
+                roomDraw[roomId] = 0;
             }else{
-                roomRound[roomId] ++;
+                roomDraw[roomId] ++;
             };
         };
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomRound[roomId], topic[roomId], roundChange[roomId]);
+        let round = roomRound[roomId];
+        topic[roomId] = topics[topicIndex[roomId][round]];
+        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
     })
 
     socket.on('getTime', (roomId, count) => {

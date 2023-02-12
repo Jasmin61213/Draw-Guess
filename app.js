@@ -4,8 +4,12 @@ const port = 3000;
 const http = require('http');
 const server = http.createServer(app);
 
-const bodyParser = require('body-parser');
-const urlencodedParser = bodyParser.urlencoded({ extended: false });
+const authRoute = require("./routes/auth");
+// const {pool} = require('./model');
+
+// require('dotenv').config();
+// const bodyParser = require('body-parser');
+// const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const session = require('express-session');
 
@@ -27,6 +31,8 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use(sessionMiddleware);
 
+app.use('/api/auth', authRoute)
+
 app.get('/', (req, res) => {
     res.render('index');
 });
@@ -37,24 +43,6 @@ app.get('/lobby', (req, res) => {
 
 app.get('/draw', (req, res) => {
     res.render('draw');
-});
-
-app.post('/login',urlencodedParser,async(req, res) => {
-    const user = req.body.name;
-    req.session.user = user;
-    res.status(200).json({'ok':true});
-});
-
-app.get('/getLogin',async(req, res) => {
-    const user = req.session.user;
-    if (typeof(user) == 'undefined'){
-        res.status(400).json({'error':true});
-    }else{
-        res.status(200).json({
-            'ok':true,
-            'user':user
-        });
-    };
 });
 
 app.get('/create-room', (req, res) => {

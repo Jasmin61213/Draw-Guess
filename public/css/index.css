@@ -8,6 +8,14 @@ body{
     margin: 0;
 }
 
+button{
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: 0;
+    background-color: #fff;
+}
+
 .title{
     font-family: 'Rowdies', cursive;
     margin: 30px 0 20px 0;
@@ -46,6 +54,7 @@ body{
 }
 
 .wrap{
+    width: 300px;
     /* display: flex;
     justify-content: center; */
     /* position: relative; */
@@ -58,10 +67,46 @@ body{
 }
 
 .member{
-    margin: 60px 0 25px 50px;
+    margin: 40px 0 10px 40px;
     /* margin-top: 30px;
     margin-left: 50px; */
     width: 220px;
+}
+
+.nav{
+    display: flex;
+    justify-content: center;
+}
+
+.sign-in-title{
+    cursor: pointer;
+    width: 130px;
+    margin-right: 10px;
+    margin-left: 10px;
+    flex: auto;
+    font-family: 'Rowdies', cursive;
+    font-size: 28px;
+    color: #65524D;
+    background-color: #ECE2D0;
+    border-radius: 50px;
+}
+.sign-in-title:hover{
+    background-color: #ECE2D0 !important;
+}
+
+.sign-up-title{
+    cursor: pointer;
+    width: 130px;
+    margin-right: 10px;
+    margin-left: 10px;
+    flex: none;
+    font-family: 'Rowdies', cursive;
+    font-size: 28px;
+    color: #65524D;
+    border-radius: 50px;
+}
+.sign-up-title:hover{
+    background-color: #ECE2D0 !important;
 }
 
 .title-text{
@@ -70,19 +115,35 @@ body{
     margin-bottom: 10px;
 }
 
-.input-div{
+.sign-in-input-div{
+    /* display: none; */
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    /* display: flex; */
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.sign-up-input-div{
+    display: none;
+    /* display: flex; */
+    flex-wrap: wrap;
+    justify-content: center;
+    /* display: flex; */
+    margin-top: 10px;
     margin-bottom: 20px;
 }
 
 .input{
-    flex: none;
+    flex: wrap;
     width: 250px;
+    margin: 8px 0 8px 0;
     border: 0;
-    border-width: 2px 0 2px 2px;
+    border-width: 2px;
     border-style: solid;
     border-color: #ece2d0;
-    border-radius: 5px 0 0 5px;
+    border-radius: 10px;
     height: 32px;
     padding: 0 0 0 10px;
     font-size: 20px;
@@ -95,12 +156,13 @@ input:focus{
 
 .button{
     cursor: pointer;
-    flex: none;
+    /* flex: none; */
+    margin-top: 10px;
     padding-top: 4px;
-    width: 50px;
+    width: 260px;
     border: none;
-    border-radius: 0 5px 5px 0;
-    border-width: 2px 2px 2px 0;
+    border-radius: 10px;
+    border-width: 2px;
     background-color: #d3a588;
     color: #fff;
     height: 36px;

@@ -8,7 +8,7 @@ socket.emit('join-room', roomId);
 //驗證登入者
 let user;
 async function login(){
-    const response = await fetch('/getLogin');
+    const response = await fetch('/api/auth/getLogin');
     const res = await response.json();
     if (res.ok == true){
         user = res.user;
@@ -67,10 +67,12 @@ function game(){
             const memberName = document.querySelectorAll(".memberName");
             const memberScore = document.querySelectorAll(".memberScore");
             for (let i =0; i<img.length; i++){
+                img[i].src = '/image/paws.png';
                 block[i].style.backgroundColor = '#ECE2D0';
                 memberName[i].style.color = '#65524D';
                 memberScore[i].style.color = '#65524D';
             };
+            img[roomRound].src = '/image/pencillittle-r.png';
             block[roomRound].style.backgroundColor = '#9C7C6B';
             memberName[roomRound].style.color = '#fff';
             memberScore[roomRound].style.color = '#fff';
@@ -87,8 +89,8 @@ function game(){
                     timerId = setInterval(timer, 10);
                 };
                 let count = 100;
-                // let min = 1/60;
-                let min = 0.1;
+                let min = 1/60;
+                // let min = 0.1;
                 function timer() {
                     count -= min;
                     if (count <= 0) {
@@ -149,7 +151,7 @@ function game(){
                 const left = document.createElement('div');
                 left.className = 'left';
                 const img = document.createElement('img');
-                img.src = '/image/pencillittle-r.png';
+                img.src = '/image/paws.png';
                 img.className = 'memberPic';
                 const right = document.createElement('div');
                 right.className = 'right';

@@ -13,10 +13,21 @@
             <div class="wrap-all">
                 <div class="wrap">
                     <img src="/image/cat.jpg" class="member">
-                    <div class="title-text">請輸入暱稱：</div>
-                    <div class="input-div">
-                        <input type="text" class="input" id="username">
-                        <button class="button" onclick="postUser()"><img src='/image/pencillittle.png' width="26px"></button>
+                    <div class="nav">
+                        <button class="sign-in-title">Sign in</button>
+                        <button class="sign-up-title">Sign up</button>
+                    </div>
+                    <!-- <div class="title-text">請輸入暱稱：</div> -->
+                    <div class="sign-in-input-div">
+                        <input type="text" class="input" id="email" placeholder="Email">
+                        <input type="password" class="input" id="password" placeholder="Password">
+                        <button class="button" onclick="signIn()"><img src='/image/pencillittle.png' width="26px"></button>
+                    </div>
+                    <div class="sign-up-input-div">
+                        <input type="text" class="input" id="username" placeholder="Username">
+                        <input type="text" class="input" id="signup-email" placeholder="Email">
+                        <input type="password" class="input" id="signup-password" placeholder="Password">
+                        <button class="button" onclick="signUp()"><img src='/image/pencillittle.png' width="26px"></button>
                     </div>
                 </div>
             </div>

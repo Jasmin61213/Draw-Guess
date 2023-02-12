@@ -292,10 +292,10 @@ canvas{
 .img{
     z-index: 1;
     position: absolute;
-    top: 498px;
-    left: 35px;
-    width: 48px;
-    height: 48px;
+    top: 494px;
+    left: 28px;
+    width: 58px;
+    height: 58px;
 }
 
 .look{
@@ -433,9 +433,9 @@ canvas{
 }
 
 .memberPic{
-    margin: 20px 13px 0 15px;
-    width: 40px;
-    height: 40px;
+    margin: 17px 13px 0 15px;
+    width: 46px;
+    height: 46px;
 }
 
 .memberName{

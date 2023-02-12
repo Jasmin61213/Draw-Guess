@@ -12,6 +12,14 @@ a{
     text-decoration: none;
 }
 
+button{
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: 0;
+    background-color: #fff;
+}
+
 .content{
     display: flex;
     width: 1200px;
@@ -46,6 +54,7 @@ a{
 }
 
 .close{
+    cursor: pointer;
     position: absolute;
     top: 20px;
     right: 10px;
@@ -573,4 +582,67 @@ input:focus{
 .li{
     font-size: 20px;
     color: #65524D;
+}
+
+.remind{
+    display: none;
+    position: absolute;
+    z-index: 3;
+    top: 200px;
+    left: 400px;
+    background-color: #ECE2D0;
+    width: 400px;
+    height: 320px;
+    border-radius: 15px;
+    border-color:#65524D;
+    border-style: solid;
+    border-width: 5px;
+    box-shadow: 1px 1px 2px  #b4b4b4;
+}
+
+.cry{
+    width: 150px;
+    margin: 15px 0 -10px 125px;
+}
+
+.remind-text{
+    font-size: 32px;
+    color: #65524D;
+    text-align: center;
+}
+
+.yes{
+    cursor: pointer;
+    position: absolute;
+    font-family: 'Rowdies', cursive;
+    font-size: 24px;
+    margin-top: 20px;
+    left: 80px;
+    width: 100px;
+    height: 40px;
+    background-color: #d3a588;
+    border-radius: 5px;
+}
+.yes:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
+}
+
+.no{
+    cursor: pointer;
+    position: absolute;
+    font-family: 'Rowdies', cursive;
+    font-size: 24px;
+    margin-top: 20px;
+    left: 220px;
+    width: 100px;
+    height: 40px;
+    background-color: #d3a588;
+    border-radius: 5px;
+}
+.no:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
 }

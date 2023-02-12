@@ -1,3 +1,13 @@
+const remind = document.querySelector('.remind');
+const remindText = document.querySelector('.remind-text');
+const remindButton = document.querySelector('.remind-button');
+
+remindButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    remind.style.display = 'none';
+})
+
+
 function signIn(){
     let email = document.getElementById('email').value;
     let password = document.getElementById('password').value;
@@ -21,6 +31,10 @@ function signIn(){
     .then(function(res){
         if (res.ok == true){
             window.location.href = '/lobby';
+        };
+        if (res.error == true){
+            remind.style.display = 'block';
+            remindText.textContent = res.message;
         };
     });
 };
@@ -52,9 +66,12 @@ function signUp(){
             signUpButton.style.backgroundColor = '#fff';
             signInDiv.style.display = 'flex';
             signUpDiv.style.display = 'none';
-        }else{
-            
         }
+        if (res.error == true){
+            console.log('error')
+            remind.style.display = 'block';
+            remindText.textContent = res.message;
+        };
     });
 };
 

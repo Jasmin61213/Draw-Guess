@@ -203,9 +203,9 @@ greyPen.addEventListener('click', (e) => {
 eraser.addEventListener('click', (e) => {
     e.preventDefault();
     color = "#fff";
-    width = 30;
+    width = 35;
     ctx.strokeStyle = "#fff";
-    ctx.lineWidth = 30;
+    ctx.lineWidth = 35;
     colorSelected(eraser);
     socket.emit('brushChanged', roomId, color, width);
 });

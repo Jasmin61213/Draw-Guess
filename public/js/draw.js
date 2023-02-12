@@ -200,7 +200,7 @@ function game(){
     socket.on('nextDraw', (userName) => {
         const guessItem = document.createElement('li');
         guessItem.className = 'li'
-        guessItem.textContent = `這回合輪到${userName}！`;
+        guessItem.textContent = `這回合輪到${userName}`;
         guessMessages.appendChild(guessItem);
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
@@ -240,7 +240,7 @@ function game(){
     socket.on('winMessage', (user) => {
         const guessItem = document.createElement('li');
         guessItem.className = 'li'
-        guessItem.textContent = `'恭喜${user}猜對了！`;
+        guessItem.textContent = `恭喜${user}猜對了！`;
         guessMessages.appendChild(guessItem);
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
@@ -261,3 +261,24 @@ function game(){
         chatMessages.scrollTo(0, chatMessages.scrollHeight);
     });
 };
+
+//離開房間
+const leaveRoomButton = document.querySelector('.close');
+const remind = document.querySelector('.remind');
+const yes = document.querySelector('.yes');
+const no = document.querySelector('.no');
+
+leaveRoomButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    remind.style.display = 'block';
+});
+
+yes.addEventListener('click' ,(e) => {
+    e.preventDefault();
+    window.location.href ='/lobby';
+})
+
+no.addEventListener('click' ,(e) => {
+    e.preventDefault();
+    remind.style.display = "none";
+})

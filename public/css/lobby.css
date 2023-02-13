@@ -57,10 +57,29 @@ a{
     margin-left: 19px;
     display: grid;
     grid-template-columns:repeat(3, 240px);
-    /* grid-template-rows: repeat(2, 160px);  */
     column-gap: 20px;
     row-gap: 10px;
-    overflow: scroll;
+    overflow: auto;
+}
+
+.no-room{
+    display: none;
+    width: 765px;
+    height: 235px;
+    background-color: #fff;
+    padding-top: 40px;
+}
+
+.suspicious{
+    width: 150px;
+    margin-left: 307.5px;
+    margin-bottom: 10px;
+}
+
+.no-room-text{
+    font-size: 28px;
+    color: #65524D;
+    text-align: center;
 }
 
 .block{

@@ -14,7 +14,7 @@ async function login(){
         user = res.user;
         game();
     }else{
-
+        
     }
 };
 login();
@@ -34,7 +34,7 @@ function game(){
 
     socket.emit('roomStatus', roomId);
     socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic, roundChange) => {
-        console.log(roomInfo, roomMember, roomRound, roundChange);
+        // console.log(roomInfo, roomMember, roomRound, roundChange);
         if (roomInfo == 'waiting'){
             topicDiv.style.display = 'none';
             waitText.style.display = 'block';
@@ -77,7 +77,6 @@ function game(){
             memberName[roomRound].style.color = '#fff';
             memberScore[roomRound].style.color = '#fff';
             if (user == roomMember[roomRound]){
-                clearCanvas();
                 penChanged.style.display = 'block';
                 look.style.display = 'none';
                 topicDiv.textContent = '題目：' + topic;
@@ -89,7 +88,7 @@ function game(){
                     timerId = setInterval(timer, 10);
                 };
                 let count = 100;
-                let min = 1/60;
+                let min = 1/90;
                 // let min = 0.1;
                 function timer() {
                     count -= min;
@@ -97,7 +96,7 @@ function game(){
                         socket.emit('nextRound', roomId);
                         socket.emit('lose', roomId, topic);
                         clearInterval(timerId);
-                        console.log(topic)
+                        clearCanvas();
                         // count = 100;
                     }
                     socket.on('stopTime', () => {
@@ -108,6 +107,7 @@ function game(){
                     socket.emit('getTime', roomId, count);
                 };
             }else{
+                // clearInterval(timerId);
                 penChanged.style.display = 'none';
                 look.style.display = 'block';
                 topicDiv.style.display = 'none';

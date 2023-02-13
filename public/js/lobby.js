@@ -4,6 +4,7 @@ socket.emit('getRoom');
 
 const newRoom = document.querySelector('.button');
 const wrap = document.querySelector('.wrap');
+const noRoom = document.querySelector('.no-room');
 
 newRoom.addEventListener('click', function(e) {
     e.preventDefault();
@@ -26,7 +27,11 @@ socket.on('lobby', async(roomInfo, roomMember) => {
     const allRoomId = Object.keys(roomInfo); 
     const allRoomInfo = Object.values(roomInfo); 
     const allRoomMember = Object.values(roomMember); 
+    if (allRoomId.length == 0){
+        noRoom.style.display = 'block';
+    }
     for (let i=0; i<allRoomInfo.length; i++){
+        noRoom.style.display = 'none';
         const roomBlock = document.createElement('a');
         const roomOwner = document.createElement('div');
         const roomMemberBlock = document.createElement('div');

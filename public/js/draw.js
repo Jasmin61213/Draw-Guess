@@ -3,7 +3,7 @@ const socket = io();
 //加入房間
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get('room');
-socket.emit('join-room', roomId);
+socket.emit('joinRoom', roomId);
 
 //驗證登入者
 let user;
@@ -14,7 +14,7 @@ async function login(){
         user = res.user;
         game();
     }else{
-        
+
     }
 };
 login();

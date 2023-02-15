@@ -16,6 +16,44 @@
                         <img src="/image/suspicious.png" class="suspicious">
                         <div class="no-room-text">目前沒有房間，快來建立一個吧！</div>
                     </div>
+                    <div class="remind">
+                        <img src="/image/close.png" class="close">
+                        <div class="remind-title">房間資訊</div>
+                        <div class="remind-text">房間最多人數
+                            <select class="select" id="max">  
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        <div class="remind-text">贏家分數
+                            <select class="select" id="score">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                                <option value="50">50</option>
+                                <option value="60">60</option>
+                                <option value="100">100</option>
+                                <option value="150">150</option>
+                            </select>
+                        </div>
+                        <div class="radio-div">
+                            <input type="radio" class="radio" name="public" value="public" checked>
+                            <label for="afternoon" class="radio-label">公開房間</label>
+                            <input type="radio" class="radio" name="public" value="privacy">
+                            <label for="afternoon" class="radio-label">私人房間</label>
+                        </div>
+                        <button class="remind-button">建立</button>
+                    </div>
                     <!-- <div class="block">
                     </div>
                     <div class="block">

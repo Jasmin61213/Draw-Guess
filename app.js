@@ -45,10 +45,10 @@ app.get('/draw', (req, res) => {
     res.render('draw');
 });
 
-app.get('/create-room', (req, res) => {
-    const roomId = Date.now();
-    res.status(200).json({'roomId':roomId});
-});
+// app.get('/create-room', (req, res) => {
+//     const roomId = Date.now();
+//     res.status(200).json({'roomId':roomId});
+// });
 
 //socket.io
 const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
@@ -56,6 +56,9 @@ const wrap = middleware => (socket, next) => middleware(socket.request, {}, next
 io.use(wrap(sessionMiddleware));
 
 const roomInfo = {};
+const roomMaxMember = {};
+const roomMaxScore = {};
+const roomPublic = {};
 const roomMember = {};
 const roomScore = {};
 const roomRound = {};
@@ -84,7 +87,15 @@ io.on('connection', (socket) => {
 
     //房間
     socket.on('getRoom',() => {
-        io.emit('lobby', roomInfo, roomMember);
+        io.emit('lobby', roomInfo, roomMember, roomMaxMember, roomPublic);
+    });
+
+    socket.on('createRoom', (maxMember, maxScore, public) => {
+        const roomId = Date.now();
+        roomMaxMember[roomId] = maxMember;
+        roomMaxScore[roomId] = maxScore;
+        roomPublic[roomId] = public;
+        socket.emit('createRoom', (roomId));
     });
 
     socket.on('roomStatus', (roomId) => {
@@ -92,7 +103,7 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
     })
 
-    socket.on('join-room', (roomId) => {
+    socket.on('joinRoom', (roomId) => {
         roundChange[roomId] = false;
         socket.join(roomId);
         if (!roomMember[roomId]){
@@ -105,7 +116,7 @@ io.on('connection', (socket) => {
         if (typeof roomInfo[roomId] == 'undefined'){
             roomInfo[roomId] = 'waiting';
         }
-        io.emit('lobby', roomInfo, roomMember);
+        io.emit('lobby', roomInfo, roomMember, roomMaxMember, roomPublic);
         io.to(roomId).emit('connectToRoom', `${userName}加入了！`);
         io.to(roomId).emit('member', roomMember[roomId]);
         io.to(roomId).emit('score', roomScore);
@@ -129,6 +140,9 @@ io.on('connection', (socket) => {
             }
             if (roomMember[leaveRoomId].length == 0){
                 delete roomInfo[leaveRoomId];
+                delete roomMaxMember[leaveRoomId];
+                delete roomMaxScore[leaveRoomId];
+                delete roomPublic[leaveRoomId];
                 delete roomMember[leaveRoomId];
                 delete roomScore[userName];
                 delete roomDraw[leaveRoomId];
@@ -137,7 +151,7 @@ io.on('connection', (socket) => {
             };
         };
         socket.leave(leaveRoomId); 
-        io.emit('lobby', roomInfo, roomMember);
+        io.emit('lobby', roomInfo, roomMember, roomMaxMember, roomPublic);
         io.to(leaveRoomId).emit('leaveRoom', `${userName}離開了！`);
         io.to(leaveRoomId).emit('member', roomMember[leaveRoomId]);
         io.to(leaveRoomId).emit('score', roomScore);

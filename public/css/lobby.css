@@ -12,6 +12,14 @@ a{
     text-decoration:none;
 }
 
+button{
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: 0;
+    background-color: #fff;
+}
+
 .title{
     font-family: 'Rowdies', cursive;
     margin: 30px 0 20px 0;
@@ -52,6 +60,7 @@ a{
 }
 
 .wrap{
+    position: relative;
     width: 765px;
     height: 355px;
     margin-left: 19px;
@@ -68,6 +77,107 @@ a{
     height: 235px;
     background-color: #fff;
     padding-top: 40px;
+}
+
+.remind{
+    display: none;
+    position: absolute;
+    z-index: 1;
+    /* top: 0px; */
+    left: 182.5px;
+    background-color: #ECE2D0;
+    width: 400px;
+    height: 300px;
+    border-radius: 15px;
+    border-color:#65524D;
+    border-style: solid;
+    border-width: 5px;
+    box-shadow: 1px 1px 2px  #b4b4b4;
+}
+
+.close{
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    left: 365px;
+    width: 24px;
+}
+
+.remind-title{
+    margin-top: 10px;
+    margin-bottom: -3px;
+    font-size: 32px;
+    color: #65524D;
+    text-align: center;
+}
+
+.remind-text{
+    margin-top: 18px;
+    font-size: 24px;
+    color: #65524D;
+    text-align: center;
+    padding-bottom: -5px;
+}
+
+.select{
+    /* display: inline-block; */
+    /* margin-bottom: 5px; */
+    width: 70px;
+    /* height: 35px; */
+    font-size: 20px;
+    /* line-height: 20px; */
+    /* padding-left: 5px; */
+    text-align: center;
+    color: #65524D;
+    text-shadow: none;
+    border: 1px solid #65524D;
+    border-radius: 5px;
+    vertical-align:middle; margin-bottom:4px;
+    /* margin-left: 170px; */
+}
+
+.radio-div{
+    margin-top: 18px;
+}
+
+.radio{
+    margin-left: 48px;
+}
+
+input[type="radio"]{
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    accent-color: #65524D;
+    border: 0px none;
+    vertical-align:middle; margin-bottom:10px;
+}
+
+.radio-label{
+    margin-top: 15px;
+    font-size: 24px;
+    color: #65524D;
+    /* text-align: center; */
+}
+
+.remind-button{
+    cursor: pointer;
+    /* position: absolute; */
+    /* font-family: 'Rowdies', cursive; */
+    font-size: 24px;
+    color: #fff;
+    margin-top: 12px;
+    margin-left: 150px;
+    /* left: 150px; */
+    width: 100px;
+    height: 40px;
+    background-color: #d3a588;
+    border-radius: 5px;
+}
+.remind-button:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
 }
 
 .suspicious{

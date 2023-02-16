@@ -56,6 +56,7 @@ function game(){
             };
         };
         if (roomInfo == 'playing'){
+            look.style.display = 'block';
             if (roundChange){
                 guessInput.value = '';
                 clearCanvas();
@@ -93,6 +94,7 @@ function game(){
                 function timer() {
                     count -= min;
                     if (count <= 0) {
+                        look.style.display = 'block';
                         socket.emit('nextRound', roomId);
                         socket.emit('lose', roomId, topic);
                         clearInterval(timerId);
@@ -109,7 +111,7 @@ function game(){
             }else{
                 // clearInterval(timerId);
                 penChanged.style.display = 'none';
-                look.style.display = 'block';
+                // look.style.display = 'block';
                 topicDiv.style.display = 'none';
                 guessInput.removeAttribute('disabled', 'disabled');
                 guessInput.style.cursor = 'auto';
@@ -186,11 +188,8 @@ function game(){
         if (guessInput.value){
             socket.emit('guess', guessInput.value, roomId);
             if (guessInput.value == topic){
-                async function win(){
-                    const stopTimeSocket = await socket.emit('stopTime', roomId);
-                    const winSocket = await socket.emit('win', roomId, user);
-                }
-                win();
+                    socket.emit('stopTime', roomId);
+                    socket.emit('win', roomId, user);
             }else{
                 guessInput.value = '';
             };
@@ -262,23 +261,38 @@ function game(){
     });
 };
 
+//複製房間連結
+const shareDiv = document.querySelector('.share');
+const share = document.querySelector('.share-input');
+share.value = window.location.href;
+
+document.querySelector('.share-close').addEventListener('click', () => {
+    shareDiv.style.display = 'none';
+});
+
+document.querySelector('.share-img').addEventListener('click', () => {
+    shareDiv.style.display = 'block';
+});
+
+document.querySelector('.share-button').addEventListener('click', () => {
+    navigator.clipboard.writeText(share.value);
+    document.querySelector('.success').style.display = 'block';
+});
+
 //離開房間
 const leaveRoomButton = document.querySelector('.close');
 const remind = document.querySelector('.remind');
 const yes = document.querySelector('.yes');
 const no = document.querySelector('.no');
 
-leaveRoomButton.addEventListener('click', (e) => {
-    e.preventDefault();
+leaveRoomButton.addEventListener('click', () => {
     remind.style.display = 'block';
 });
 
-yes.addEventListener('click' ,(e) => {
-    e.preventDefault();
+yes.addEventListener('click' ,() => {
     window.location.href ='/lobby';
-})
+});
 
-no.addEventListener('click' ,(e) => {
-    e.preventDefault();
+no.addEventListener('click' ,() => {
     remind.style.display = "none";
-})
+});

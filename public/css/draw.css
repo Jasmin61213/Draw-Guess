@@ -53,6 +53,15 @@ button{
     text-stroke: 5px #65524D;
 }
 
+.share-img{
+    cursor: pointer;
+    position: absolute;
+    top: 26px;
+    right: 82px;
+    width: 40px;
+    height: 40px;
+}
+
 .close{
     cursor: pointer;
     position: absolute;
@@ -584,6 +593,86 @@ input:focus{
     color: #65524D;
 }
 
+.share{
+    display: none;
+    position: absolute;
+    z-index: 3;
+    top: 200px;
+    left: 400px;
+    background-color: #ECE2D0;
+    width: 400px;
+    height: 235px;
+    border-radius: 15px;
+    border-color:#65524D;
+    border-style: solid;
+    border-width: 5px;
+    box-shadow: 1px 1px 2px  #b4b4b4;
+}
+
+.share-close{
+    cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+}
+
+.share-text{
+    margin-top: 25px;
+    font-size: 24px;
+    color: #65524D;
+    text-align: center;
+}
+
+.share-input{
+    position: absolute;
+    left: 33px;
+    font-size: 16px;
+    width: 320px;
+    margin: 8px 0 8px 0;
+    border: 0;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #65524D;
+    border-radius: 10px;
+    height: 28px;
+    padding: 0.5px 5px 0.5px 5px;
+    font-size: 20px;
+    color: #65524D;
+}
+
+.success{
+    display: none;
+    position: absolute;
+    top: 140px;
+    left: 146px;
+    font-size: 18px;
+    color: #65524D;
+}
+
+.share-button{
+    cursor: pointer;
+    position: absolute;
+    font-family: 'Rowdies', cursive;
+    font-size: 24px;
+    margin-top: 20px;
+    color: #65524D;
+    top: 155px;
+    left: 150px;
+    width: 100px;
+    height: 40px;
+    border-color:#65524D;
+    border-style: solid;
+    border-width: 2px;
+    background-color: #d3a588;
+    border-radius: 5px;
+}
+.share-button:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
+}
+
 .remind{
     display: none;
     position: absolute;
@@ -617,9 +706,13 @@ input:focus{
     font-family: 'Rowdies', cursive;
     font-size: 24px;
     margin-top: 20px;
+    color: #65524D;
     left: 80px;
     width: 100px;
     height: 40px;
+    border-color:#65524D;
+    border-style: solid;
+    border-width: 2px;
     background-color: #d3a588;
     border-radius: 5px;
 }
@@ -635,9 +728,13 @@ input:focus{
     font-family: 'Rowdies', cursive;
     font-size: 24px;
     margin-top: 20px;
+    color: #65524D;
     left: 220px;
     width: 100px;
     height: 40px;
+    border-color:#65524D;
+    border-style: solid;
+    border-width: 2px;
     background-color: #d3a588;
     border-radius: 5px;
 }

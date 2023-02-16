@@ -48,7 +48,6 @@ socket.on('lobby', async(roomInfo, roomMember, roomMax, roomPublic) => {
     const allRoomMember = Object.values(roomMember); 
     const allRoomMax = Object.values(roomMax); 
     const allRoomPublic = Object.values(roomPublic); 
-    // console.log(allRoomPublic.includes('public'))
     if (!allRoomPublic.includes('public')){
         noRoom.style.display = 'block';
     }else{

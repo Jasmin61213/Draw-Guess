@@ -3,7 +3,7 @@ const socket = io();
 //加入房間
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get('room');
-socket.emit('joinRoom', roomId);
+// socket.emit('joinRoom', roomId);
 
 //驗證登入者
 let user;
@@ -11,11 +11,13 @@ async function login(){
     const response = await fetch('/api/auth/getLogin');
     const res = await response.json();
     if (res.ok == true){
+        socket.emit('joinRoom', roomId);
         user = res.user;
         game();
     }else{
-
-    }
+        shareDiv.style.display = 'none';
+        signDiv.style.display = 'block';
+    };
 };
 login();
 
@@ -295,4 +297,88 @@ yes.addEventListener('click' ,() => {
 
 no.addEventListener('click' ,() => {
     remind.style.display = "none";
+});
+
+//登入帳號
+function signIn(){
+    let email = document.getElementById('email').value;
+    let password = document.getElementById('password').value;
+
+    data = {
+        'email':email,
+        'password':password
+    };
+    fetch('/api/auth/login',{
+        method: 'POST',
+        body: JSON.stringify(data),
+        cache: "no-cache",
+        headers:{
+            "Accept" : "application/json",
+            "Content-Type" : "application/json"
+        }
+    })
+    .then(function(response){
+        return response.json();
+    })
+    .then(function(res){
+        if (res.ok == true){
+            location.reload();
+        };
+    });
+};
+
+function signUp(){
+    let user = document.getElementById('username').value;
+    let email = document.getElementById('signup-email').value;
+    let password = document.getElementById('signup-password').value;
+    data = {
+        'name':user,
+        'email':email,
+        'password':password
+    };
+    fetch('/api/auth/signup',{
+        method: 'POST',
+        body: JSON.stringify(data),
+        cache: "no-cache",
+        headers:{
+            "Accept" : "application/json",
+            "Content-Type" : "application/json"
+        }
+    })
+    .then(function(response){
+        return response.json();
+    })
+    .then(function(res){
+        if (res.ok == true){
+            signInButton.style.backgroundColor = '#d3a588';
+            signUpButton.style.backgroundColor = '#ECE2D0';
+            signInDiv.style.display = 'flex';
+            signDiv.style.height = '225px';
+            signUpDiv.style.display = 'none';
+        }
+    });
+};
+
+const signDiv = document.querySelector('.nav');
+const signInButton = document.querySelector('.sign-in-title');
+const signUpButton = document.querySelector('.sign-up-title');
+const signInDiv = document.querySelector('.sign-in-input-div');
+const signUpDiv = document.querySelector('.sign-up-input-div');
+
+signInButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    signInButton.style.backgroundColor = '#d3a588';
+    signUpButton.style.backgroundColor = '#ECE2D0';
+    signInDiv.style.display = 'flex';
+    signDiv.style.height = '225px';
+    signUpDiv.style.display = 'none';
+});
+
+signUpButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    signInButton.style.backgroundColor = '#ECE2D0';
+    signUpButton.style.backgroundColor = '#d3a588';
+    signInDiv.style.display = 'none';
+    signUpDiv.style.display = 'flex';
+    signDiv.style.height = '275px';
 });

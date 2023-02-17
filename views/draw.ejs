@@ -9,6 +9,21 @@
     <body>
         <div class="content">
             <div class="left">
+                <div class="nav">
+                    <button class="sign-in-title">Sign in</button>
+                    <button class="sign-up-title">Sign up</button>
+                    <div class="sign-in-input-div">
+                        <input type="text" class="sign-input" id="email" placeholder="Email" value="jasmin@gmail.com">
+                        <input type="password" class="sign-input" id="password" placeholder="Password" value="1213">
+                        <button class="sign-button" onclick="signIn()">Sign in</button>
+                    </div>
+                    <div class="sign-up-input-div">
+                        <input type="text" class="sign-input" id="username" placeholder="Username">
+                        <input type="text" class="sign-input" id="signup-email" placeholder="Email">
+                        <input type="password" class="sign-input" id="signup-password" placeholder="Password">
+                        <button class="sign-button" onclick="signUp()">Sign up</button>
+                    </div>
+                </div>
                 <div class="share">
                     <img src="/image/close.png" class="share-close">
                     <div class="share-text">複製以下連結分享給朋友，<br>邀請他們來玩吧！</div>
@@ -45,7 +60,9 @@
                 </div>
                 <div class="time"><div class="bar"></div></div>
                 <div class="member-list">Member</div>
-                <div class="member"></div>
+                <div class="member">
+                    <!-- <div class="memberBlock"><div class="left"><img src="/image/paws.png" class="memberPic"></div><div class="right"><div class="memberName">你是我的小蘋果</div><div class="memberScore" id="Jasmin">Score：0</div></div></div> -->
+                </div>
             </div>
             <div class="right">
                 <img src="/image/share.png" class="share-img">

@@ -200,9 +200,9 @@ input:focus{
 
 .button{
     cursor: pointer;
-    /* flex: none; */
+    font-family: 'Rowdies', cursive;
     margin-top: 10px;
-    padding-top: 4px;
+    padding-bottom: 10px;
     width: 260px;
     border: none;
     border-radius: 10px;
@@ -210,7 +210,8 @@ input:focus{
     background-color: #d3a588;
     color: #fff;
     height: 36px;
-    font-size: 20px;
+    font-size: 24px;
+    line-height: 36px;
 }
 .button:hover{
     transition-duration: 0.4s;

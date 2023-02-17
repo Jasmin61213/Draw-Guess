@@ -45,11 +45,6 @@ app.get('/draw', (req, res) => {
     res.render('draw');
 });
 
-// app.get('/create-room', (req, res) => {
-//     const roomId = Date.now();
-//     res.status(200).json({'roomId':roomId});
-// });
-
 //socket.io
 const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
 
@@ -115,7 +110,7 @@ io.on('connection', (socket) => {
         roomScore[userName] = 0;
         if (typeof roomInfo[roomId] == 'undefined'){
             roomInfo[roomId] = 'waiting';
-        }
+        };
         io.emit('lobby', roomInfo, roomMember, roomMaxMember, roomPublic);
         io.to(roomId).emit('connectToRoom', `${userName}加入了！`);
         io.to(roomId).emit('member', roomMember[roomId]);
@@ -218,7 +213,6 @@ io.on('connection', (socket) => {
                 };
             topicIndex[roomId].push(str);
         };
-        // console.log(topicIndex[roomId])
         let round = roomRound[roomId];
         topic[roomId] = topics[topicIndex[roomId][round]];
         io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);

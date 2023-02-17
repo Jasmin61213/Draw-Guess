@@ -16,15 +16,6 @@ document.querySelector('.close').addEventListener('click', (e) => {
 newRoom.addEventListener('click', (e) => {
     e.preventDefault();
     set.style.display = 'block';
-    // fetch('/create-room')
-    // .then(function(response){
-    //     return response.json();
-    // })
-    // .then(function(res){
-    //     // if (res.status == 200){
-    //     window.location.href = '/draw?room=' + res.roomId;
-    //     // };
-    // });
 });
 
 create.addEventListener('click', (e) => {

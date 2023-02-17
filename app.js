@@ -145,9 +145,11 @@ io.on('connection', (socket) => {
                 delete topic[leaveRoomId];
             };
         };
+        if (typeof(userName) != 'undefined'){
+            io.to(leaveRoomId).emit('leaveRoom', `${userName}離開了！`);
+        };
         socket.leave(leaveRoomId); 
         io.emit('lobby', roomInfo, roomMember, roomMaxMember, roomPublic);
-        io.to(leaveRoomId).emit('leaveRoom', `${userName}離開了！`);
         io.to(leaveRoomId).emit('member', roomMember[leaveRoomId]);
         io.to(leaveRoomId).emit('score', roomScore);
         io.to(leaveRoomId).emit('roomStatus', roomInfo[leaveRoomId], roomMember[leaveRoomId], roomDraw[leaveRoomId], topic[leaveRoomId], roundChange[leaveRoomId]);
@@ -219,6 +221,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('win', (roomId, user) => {
+        roomInfo[roomId] = 'resting';
         roundChange[roomId] = true;
         roomRound[roomId] ++;
         let Users = roomMember[roomId];
@@ -241,6 +244,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('nextRound', (roomId) => {
+        roomInfo[roomId] = 'resting';
         roundChange[roomId] = true;
         roomRound[roomId] ++;
         if (typeof(roomMember[roomId]) != 'undefined'){
@@ -253,7 +257,12 @@ io.on('connection', (socket) => {
         let round = roomRound[roomId];
         topic[roomId] = topics[topicIndex[roomId][round]];
         io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
-    })
+    });
+
+    socket.on('startRound', (roomId) => {
+        roomInfo[roomId] = 'playing';
+        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
+    });
 
     socket.on('getTime', (roomId, count) => {
         socket.broadcast.to(roomId).emit('getTime', count);

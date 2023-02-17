@@ -33,6 +33,7 @@ function game(){
     const penChanged = document.querySelector('.pen');
     let topic;
     let timerId;
+    let restTimerId
 
     socket.emit('roomStatus', roomId);
     socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic, roundChange) => {
@@ -122,12 +123,34 @@ function game(){
                 });
             };
         };
+        if (roomInfo == 'resting'){
+            guessInput.value = '';
+            penChanged.style.display = 'none';
+            look.style.display = 'block';
+            topicDiv.textContent = '中場休息';
+            topicDiv.style.display = 'block';
+            guessInput.setAttribute('disabled', 'disabled'); 
+            guessInput.style.cursor = 'not-allowed';
+            restTimerId = setInterval(timer, 10);
+            let restCount = 100;
+            let restMin = 1/10;
+            function timer() {
+                restCount -= restMin;
+                if (restCount <= 0) {
+                    clearInterval(restTimerId);
+                    clearCanvas();
+                    if (user == roomMember[roomRound]){
+                        socket.emit('startRound', roomId);
+                    };
+                };
+                time.style.width = restCount + '%';
+            };
+        };
     });
 
     //房主按下按鈕開始遊戲，更改遊戲狀態
     startGame.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log('click')
         socket.emit('beginGame', roomId);
         startGame.style.display = 'none';
     });

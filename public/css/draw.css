@@ -317,13 +317,46 @@ canvas{
 }
 
 .look{
+    /* display: none; */
     position: absolute;
     top: 80px;
     width: 800px;
     height: 480px;
 }
 
+.rest{
+    display: none;
+    position: absolute;
+    top: 80px;
+    width: 800px;
+    height: 480px;
+    background-color: #fff;
+}
+
+.win{
+    display: none;
+    /* position: absolute;
+    top: 80px;
+    width: 800px;
+    height: 480px; */
+}
+
+.win-img{
+    position: absolute;
+    width: 216px;
+    top: 80px;
+    left: 292px;
+}
+
+.win-title{
+    margin-top: 280px;
+    text-align: center;
+    font-size: 28px;
+    color: #65524D;
+}
+
 .start{
+    /* display: none; */
     position: absolute;
     top: 80px;
     width: 800px;
@@ -357,10 +390,9 @@ canvas{
     margin-left: 325px;
     cursor: pointer;
     width: 150px;
-    padding-top: 4px;
+    /* padding-top: 4px; */
     border: none;
     border-radius: 10px;
-    /* border-width: 2px; */
     background-color: #d3a588;
     color: #fff;
     height: 46px;

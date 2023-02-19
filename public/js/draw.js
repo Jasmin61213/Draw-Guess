@@ -19,7 +19,11 @@ async function login(){
         signDiv.style.display = 'block';
     };
 };
-login();
+if (document.readyState === "complete"){
+    login();
+}else{
+    document.addEventListener("DOMContentLoaded", login);
+};
 
 function game(){
     //遊戲流程
@@ -31,9 +35,19 @@ function game(){
     const topicDiv = document.querySelector('.topic');
     const time = document.querySelector('.bar');
     const penChanged = document.querySelector('.pen');
+    const winnerDiv = document.querySelector('.win');
+    const restDiv = document.querySelector('.rest');
     let topic;
     let timerId;
     let restTimerId
+
+    socket.on('roomMaxScore', (maxScore) => {
+        const guessItem = document.createElement('li');
+        guessItem.className = 'li'
+        guessItem.textContent = `最先達到 ${ maxScore } 分者獲勝！`;
+        guessMessages.appendChild(guessItem);
+        guessMessages.scrollTo(0, guessMessages.scrollHeight);
+    });
 
     socket.emit('roomStatus', roomId);
     socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic, roundChange) => {
@@ -49,6 +63,7 @@ function game(){
                 let count = 100;
                 time.style.width = count + '%';
                 startBlock.style.display = 'block';
+                // startBlock.style.display = 'none';
                 // startGame.style.display = 'block';
                 startGame.style.display = 'none';
                 waitTextHost.style.display = 'block';
@@ -60,6 +75,7 @@ function game(){
         };
         if (roomInfo == 'playing'){
             look.style.display = 'block';
+            restDiv.style.display = 'none';
             if (roundChange){
                 guessInput.value = '';
                 clearCanvas();
@@ -124,6 +140,8 @@ function game(){
             };
         };
         if (roomInfo == 'resting'){
+            restDiv.style.display = 'block';
+            clearCanvas();
             guessInput.value = '';
             penChanged.style.display = 'none';
             look.style.display = 'block';
@@ -133,7 +151,7 @@ function game(){
             guessInput.style.cursor = 'not-allowed';
             restTimerId = setInterval(timer, 10);
             let restCount = 100;
-            let restMin = 1/10;
+            let restMin = 1/8;
             function timer() {
                 restCount -= restMin;
                 if (restCount <= 0) {
@@ -146,6 +164,24 @@ function game(){
                 time.style.width = restCount + '%';
             };
         };
+        if (roomInfo == 'ending'){
+            clearCanvas();
+            guessInput.value = '';
+            penChanged.style.display = 'none';
+            winnerDiv.style.display = 'block';
+            look.style.display = 'block';
+            topicDiv.style.display = 'none';
+            guessInput.setAttribute('disabled', 'disabled'); 
+            guessInput.style.cursor = 'not-allowed';
+            time.style.width = '100%';
+        };
+    });
+    const winTitle = document.querySelector('.win-title');
+    socket.on('winnerDraw', (winner) => {
+        winTitle.textContent = '恭喜！贏家是' + winner; 
+    });
+    socket.on('winnerUser', (winner) => {
+        winTitle.textContent = '恭喜！贏家是' + winner; 
     });
 
     //房主按下按鈕開始遊戲，更改遊戲狀態
@@ -265,6 +301,7 @@ function game(){
         const guessItem = document.createElement('li');
         guessItem.className = 'li'
         guessItem.textContent = `恭喜${user}猜對了！`;
+        guessItem.style.color = '#F2542D';
         guessMessages.appendChild(guessItem);
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });

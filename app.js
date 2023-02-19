@@ -70,7 +70,7 @@ const topics = [
     '長頸鹿','鸚鵡','內褲','音響','安全帽','豆漿','高速公路','高鐵','吉他','弓箭',
     '鯨魚','紅綠燈','斑馬線','火影忍者','外星人','大隊接力','美人魚','電腦','雪人','馬桶',
     '地圖','飛機','羊入虎口','鴨嘴獸泰瑞','海綿寶寶','旋轉木馬','葡萄汁','虎頭蛇尾','仙人掌','對牛彈琴',
-    '七上八下','吸血鬼','機器人','恐龍','蚊子','螢火蟲','毛毛蟲','一石二鳥','火龍果'
+    '七上八下','吸血鬼','機器人','恐龍','蚊子','螢火蟲','毛毛蟲','一石二鳥','火龍果','螞蟻上樹','摩斯漢堡'
 
 ];
 const topicsLength = topics.length;
@@ -112,6 +112,7 @@ io.on('connection', (socket) => {
             roomInfo[roomId] = 'waiting';
         };
         io.emit('lobby', roomInfo, roomMember, roomMaxMember, roomPublic);
+        io.to(socket.id).emit('roomMaxScore', roomMaxScore[roomId]);
         io.to(roomId).emit('connectToRoom', `${userName}加入了！`);
         io.to(roomId).emit('member', roomMember[roomId]);
         io.to(roomId).emit('score', roomScore);
@@ -228,7 +229,15 @@ io.on('connection', (socket) => {
         let round = roomDraw[roomId];
         let drawUser = Users[round];
         roomScore[drawUser] ++;
-        roomScore[user] ++;
+        roomScore[user] +=2;
+        if (roomScore[drawUser] >= roomMaxScore[roomId]){
+            roomInfo[roomId] = 'ending';
+            io.to(roomId).emit('winnerDraw', drawUser)
+        };
+        if (roomScore[user] >= roomMaxScore[roomId]){
+            roomInfo[roomId] = 'ending';
+            io.to(roomId).emit('winnerUser', user)
+        };
         if (typeof(roomMember[roomId]) != 'undefined'){
             if (roomDraw[roomId]+1 == roomMember[roomId].length){
                 roomDraw[roomId] = 0;

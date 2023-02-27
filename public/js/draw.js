@@ -35,11 +35,13 @@ function game(){
     const topicDiv = document.querySelector('.topic');
     const time = document.querySelector('.bar');
     const penChanged = document.querySelector('.pen');
-    const winnerDiv = document.querySelector('.win');
     const restDiv = document.querySelector('.rest');
+    const winnerDiv = document.querySelector('.win');
+    const refresh = document.querySelector('.refresh');
     let topic;
     let timerId;
-    let restTimerId
+    let restTimerId;
+    const restTimerIds = {};
 
     socket.on('roomMaxScore', (maxScore) => {
         const guessItem = document.createElement('li');
@@ -49,38 +51,35 @@ function game(){
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
 
-    socket.emit('roomStatus', roomId);
-    socket.on('roomStatus', (roomInfo, roomMember, roomRound, thisRoomTopic, roundChange) => {
-        // console.log(roomInfo, roomMember, roomRound, roundChange);
-        if (roomInfo == 'waiting'){
+    socket.emit('roomInfo', roomId);
+    socket.on('roomInfo', (thisRoomInfo) => {
+        // console.log(thisRoomInfo);
+        if (thisRoomInfo.roomStatus == 'waiting'){
+            look.style.display = 'none';
+            startBlock.style.display = 'block';
             topicDiv.style.display = 'none';
             waitText.style.display = 'block';
             penChanged.style.display = 'none';
-            guessInput.setAttribute('disabled', 'disabled') 
+            guessInput.setAttribute('disabled', 'disabled');
             guessInput.style.cursor = 'not-allowed';
-            if (user == roomMember[0]){
-                clearInterval(timerId);
-                let count = 100;
-                time.style.width = count + '%';
-                startBlock.style.display = 'block';
-                // startBlock.style.display = 'none';
-                // startGame.style.display = 'block';
+            winnerDiv.style.display = 'none';
+            if (user == thisRoomInfo.host){
                 startGame.style.display = 'none';
                 waitTextHost.style.display = 'block';
                 waitText.style.display = 'none';
-                if (roomMember.length != 1){
+                if (thisRoomInfo.roomMember.length != 1){
                     startGame.style.display = 'block';
-                }
+                };
             };
         };
-        if (roomInfo == 'playing'){
+        if (thisRoomInfo.roomStatus == 'playing'){
+            if (user == thisRoomInfo.host){
+                socket.emit('startTimer', roomId);
+            };  
             look.style.display = 'block';
             restDiv.style.display = 'none';
-            if (roundChange){
-                guessInput.value = '';
-                clearCanvas();
-            };
-            topic = thisRoomTopic;
+            guessInput.value = '';
+            topic = thisRoomInfo.topic;
             startBlock.style.display = 'none';
             const img = document.querySelectorAll('.memberPic');
             const block = document.querySelectorAll(".memberBlock");
@@ -92,56 +91,39 @@ function game(){
                 memberName[i].style.color = '#65524D';
                 memberScore[i].style.color = '#65524D';
             };
-            img[roomRound].src = '/image/pencillittle-r.png';
-            block[roomRound].style.backgroundColor = '#9C7C6B';
-            memberName[roomRound].style.color = '#fff';
-            memberScore[roomRound].style.color = '#fff';
-            if (user == roomMember[roomRound]){
+            img[thisRoomInfo.roomDraw].src = '/image/pencillittle-r.png';
+            block[thisRoomInfo.roomDraw].style.backgroundColor = '#9C7C6B';
+            memberName[thisRoomInfo.roomDraw].style.color = '#fff';
+            memberScore[thisRoomInfo.roomDraw].style.color = '#fff';
+            if (user == thisRoomInfo.drawer){
+                chatInput.setAttribute('disabled', 'disabled');
                 penChanged.style.display = 'block';
                 look.style.display = 'none';
                 topicDiv.textContent = '題目：' + topic;
                 topicDiv.style.display = 'block';
                 guessInput.setAttribute('disabled', 'disabled'); 
                 guessInput.style.cursor = 'not-allowed';
-                if (roundChange){
-                    socket.emit('nextDraw', roomId);
-                    timerId = setInterval(timer, 10);
-                };
-                let count = 100;
-                let min = 1/90;
-                // let min = 0.1;
-                function timer() {
-                    count -= min;
-                    if (count <= 0) {
-                        look.style.display = 'block';
-                        socket.emit('nextRound', roomId);
-                        socket.emit('lose', roomId, topic);
-                        clearInterval(timerId);
-                        clearCanvas();
-                        // count = 100;
-                    }
-                    socket.on('stopTime', () => {
-                        clearInterval(timerId);
-                        // count = 100;
-                    });
-                    time.style.width = count + '%';
-                    socket.emit('getTime', roomId, count);
-                };
+                socket.on('timer', (roomTime) => {
+                    time.style.width = roomTime + '%';
+                });
             }else{
-                // clearInterval(timerId);
+                chatInput.removeAttribute('disabled', 'disabled');
                 penChanged.style.display = 'none';
-                // look.style.display = 'block';
                 topicDiv.style.display = 'none';
                 guessInput.removeAttribute('disabled', 'disabled');
                 guessInput.style.cursor = 'auto';
-                socket.on('getTime', (roomTime) => {
+                socket.on('timer', (roomTime) => {
                     time.style.width = roomTime + '%';
                 });
             };
         };
-        if (roomInfo == 'resting'){
-            restDiv.style.display = 'block';
+        if (thisRoomInfo.roomStatus == 'resting'){
+            if (user == thisRoomInfo.host){
+                socket.emit('startRestTimer', roomId);
+            };
             clearCanvas();
+            chatInput.removeAttribute('disabled', 'disabled');
+            restDiv.style.display = 'block';
             guessInput.value = '';
             penChanged.style.display = 'none';
             look.style.display = 'block';
@@ -149,22 +131,29 @@ function game(){
             topicDiv.style.display = 'block';
             guessInput.setAttribute('disabled', 'disabled'); 
             guessInput.style.cursor = 'not-allowed';
-            restTimerId = setInterval(timer, 10);
             let restCount = 100;
             let restMin = 1/8;
-            function timer() {
+            if (!restTimerIds[roomId]){
+                restTimerId = setInterval(() =>{
                 restCount -= restMin;
                 if (restCount <= 0) {
                     clearInterval(restTimerId);
+                    delete restTimerIds[roomId];
                     clearCanvas();
-                    if (user == roomMember[roomRound]){
-                        socket.emit('startRound', roomId);
+                    restCount = 100;
                     };
-                };
                 time.style.width = restCount + '%';
+                }, 10);
             };
+            socket.on('stopRestTimer', () => {
+                clearInterval(restTimerIds[roomId]);
+                delete restTimerIds[roomId];
+                clearCanvas();
+                restCount = 100;
+            });
+            restTimerIds[roomId] = restTimerId;
         };
-        if (roomInfo == 'ending'){
+        if (thisRoomInfo.roomStatus == 'ending'){
             clearCanvas();
             guessInput.value = '';
             penChanged.style.display = 'none';
@@ -174,14 +163,21 @@ function game(){
             guessInput.setAttribute('disabled', 'disabled'); 
             guessInput.style.cursor = 'not-allowed';
             time.style.width = '100%';
+            if (user == thisRoomInfo.host){
+                refresh.style.display = 'block';
+            };
         };
     });
+
     const winTitle = document.querySelector('.win-title');
     socket.on('winnerDraw', (winner) => {
         winTitle.textContent = '恭喜！贏家是' + winner; 
     });
     socket.on('winnerUser', (winner) => {
         winTitle.textContent = '恭喜！贏家是' + winner; 
+    });
+    refresh.addEventListener('click', () => {
+        socket.emit('refresh', roomId);
     });
 
     //房主按下按鈕開始遊戲，更改遊戲狀態
@@ -197,7 +193,6 @@ function game(){
         winScore.textContent = 'Score：' + win;
         const drawScore = document.getElementById(drawUser);
         drawScore.textContent = 'Score：' + draw;
-        clearCanvas();
     });
 
     //成員列表
@@ -246,21 +241,35 @@ function game(){
 
     guessForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        if (guessInput.value){
-            socket.emit('guess', guessInput.value, roomId);
+        if (guessInput.value){ 
             if (guessInput.value == topic){
-                    socket.emit('stopTime', roomId);
-                    socket.emit('win', roomId, user);
+                guessInput.setAttribute('disabled', 'disabled');
+                chatInput.setAttribute('disabled', 'disabled');
+                socket.emit('guess', `${user}猜對了！`, roomId, true);
+                socket.emit('win', roomId, user);
             }else{
-                guessInput.value = '';
+                socket.emit('guess', `${user}猜：${guessInput.value}`, roomId, false);
             };
+            guessInput.value = '';
         };
     });
 
-    socket.on('nextDraw', (userName) => {
+    socket.on('nextDrawer', (drawer) => {
         const guessItem = document.createElement('li');
-        guessItem.className = 'li'
-        guessItem.textContent = `這回合輪到${userName}`;
+        guessItem.className = 'li';
+        guessItem.textContent = `下回合輪到${drawer}`;
+        guessMessages.appendChild(guessItem);
+        guessMessages.scrollTo(0, guessMessages.scrollHeight);
+    });
+
+    socket.on('drawer', (drawer) => {
+        const guessItem = document.createElement('li');
+        guessItem.className = 'li';
+        if (user == drawer){
+            guessItem.textContent = `這回合輪到你了！`;
+        }else{
+            guessItem.textContent = `這回合輪到${drawer}了！`;
+        };
         guessMessages.appendChild(guessItem);
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
@@ -273,10 +282,22 @@ function game(){
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
 
-    socket.on('guess', (msg, userName) => {
+    socket.on('guess', (msg, win) => {
         const guessItem = document.createElement('li');
         guessItem.className = 'li'
-        guessItem.textContent = `${userName}猜：${msg}`;
+        if (win){
+            guessItem.style.color = '#F2542D';
+        };
+        guessItem.textContent = msg;
+        guessMessages.appendChild(guessItem);
+        guessMessages.scrollTo(0, guessMessages.scrollHeight);
+    });
+
+    socket.on('everyoneCorrected', () => {
+        const guessItem = document.createElement('li');
+        guessItem.className = 'li'
+        guessItem.style.color = '#F2542D';
+        guessItem.textContent = '大家都猜對了！';
         guessMessages.appendChild(guessItem);
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
@@ -295,15 +316,6 @@ function game(){
         chatItem.textContent = `${userName}：${msg}`;
         chatMessages.appendChild(chatItem);
         chatMessages.scrollTo(0, chatMessages.scrollHeight);
-    });
-
-    socket.on('winMessage', (user) => {
-        const guessItem = document.createElement('li');
-        guessItem.className = 'li'
-        guessItem.textContent = `恭喜${user}猜對了！`;
-        guessItem.style.color = '#F2542D';
-        guessMessages.appendChild(guessItem);
-        guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
 
     socket.on('connectToRoom', (data) => {
@@ -359,6 +371,14 @@ no.addEventListener('click' ,() => {
     remind.style.display = "none";
 });
 
+const signRemind = document.querySelector('.sign-remind');
+const signRemindText = document.querySelector('.sign-remind-text');
+const signRemindButton = document.querySelector('.sign-remind-button');
+
+signRemindButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    signRemind.style.display = 'none';
+});
 //登入帳號
 function signIn(){
     let email = document.getElementById('email').value;
@@ -383,6 +403,10 @@ function signIn(){
     .then(function(res){
         if (res.ok == true){
             location.reload();
+        };
+        if (res.error == true){
+            signRemind.style.display = 'block';
+            signRemindText.textContent = res.message;
         };
     });
 };
@@ -415,7 +439,11 @@ function signUp(){
             signInDiv.style.display = 'flex';
             signDiv.style.height = '225px';
             signUpDiv.style.display = 'none';
-        }
+        };
+        if (res.error == true){
+            signRemind.style.display = 'block';
+            signRemindText.textContent = res.message;
+        };
     });
 };
 

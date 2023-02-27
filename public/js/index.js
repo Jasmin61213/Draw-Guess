@@ -5,7 +5,7 @@ const remindButton = document.querySelector('.remind-button');
 remindButton.addEventListener('click', (e) => {
     e.preventDefault();
     remind.style.display = 'none';
-})
+});
 
 
 function signIn(){
@@ -68,7 +68,6 @@ function signUp(){
             signUpDiv.style.display = 'none';
         }
         if (res.error == true){
-            console.log('error')
             remind.style.display = 'block';
             remindText.textContent = res.message;
         };

@@ -22,8 +22,31 @@ const sessionMiddleware = session({
     }
 });
 
+// 引入模組
+// const redis = require("redis");
+// const bluebird = require("bluebird");
+// const client = redis.createClient();
+// // redis server
+// client.on("connect", function() {
+//   console.log('redis connected!');
+// });
+// bluebird.promisifyAll(redis.RedisClient.prototype);
+
 const { Server } = require("socket.io");
 const io = new Server(server);
+
+// const { Server } = require("socket.io");
+// const { createAdapter } = require("@socket.io/redis-adapter");
+// const { createClient } = require("redis");
+
+// const io = new Server(server);
+
+// const pubClient = createClient();
+// const subClient = pubClient.duplicate();
+
+// io.adapter(createAdapter(pubClient, subClient));
+// io.listen(3000);
+
 
 app.set('view engine', 'ejs');
 
@@ -50,17 +73,12 @@ const wrap = middleware => (socket, next) => middleware(socket.request, {}, next
 
 io.use(wrap(sessionMiddleware));
 
-const roomInfo = {};
-const roomMaxMember = {};
-const roomMaxScore = {};
-const roomPublic = {};
-const roomMember = {};
+const allRoomInfo = {};
 const roomScore = {};
-const roomRound = {};
-const roomDraw = {};
-const roundChange = {};
-const topic = {};
-const topicIndex = {};
+const timers = {};
+const restTimers = {};
+let timer;
+let restTimer;
 const topics = [
     '向日葵','口紅','青蛙','光頭','西瓜','獅子','耳朵','皮卡丘','立可帶','警車',
     '腳踏車','鋼琴','台鐵','棉花糖','麥當勞漢堡','翻車魚','望遠鏡','相機','螞蟻','牛頭馬面',
@@ -82,93 +100,120 @@ io.on('connection', (socket) => {
 
     //房間
     socket.on('getRoom',() => {
-        io.emit('lobby', roomInfo, roomMember, roomMaxMember, roomPublic);
+        io.emit('lobby', allRoomInfo);
     });
 
-    socket.on('createRoom', (maxMember, maxScore, public) => {
+    socket.on('createRoom', (maxMember, maxScore, publics) => {
         const roomId = Date.now();
-        roomMaxMember[roomId] = maxMember;
-        roomMaxScore[roomId] = maxScore;
-        roomPublic[roomId] = public;
+        let room = {};
+        room.roomMaxMember = maxMember;
+        room.roomMaxScore = maxScore;
+        room.roomPublic = publics;
+        room.host = userName;
+        room.roomDraw = 0;
+        room.drawer = userName;
+        room.roomStatus = 'waiting';
+        room.correctNum = 0;
+        allRoomInfo[roomId] = room;
         socket.emit('createRoom', (roomId));
     });
 
-    socket.on('roomStatus', (roomId) => {
-        roundChange[roomId] = false;
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
-    })
-
     socket.on('joinRoom', (roomId) => {
-        roundChange[roomId] = false;
         socket.join(roomId);
-        if (!roomMember[roomId]){
-            roomMember[roomId] = [];
+        let thisRoom = allRoomInfo[roomId];
+        if (typeof(thisRoom) != 'undefined'){
+            if (!thisRoom.roomMember){
+                thisRoom.roomMember = [];
+            };
+            if(!thisRoom.roomMember.includes(userName)){
+                thisRoom.roomMember.push(userName);
+            };
+            roomScore[userName] = 0;
+            allRoomInfo[roomId] = thisRoom;
+            io.emit('lobby', allRoomInfo)
+            io.to(socket.id).emit('roomMaxScore', thisRoom.roomMaxScore);
+            io.to(roomId).emit('connectToRoom', `${userName}加入了！`);
+            io.to(roomId).emit('member', thisRoom.roomMember);
+            io.to(roomId).emit('score', roomScore);
+            io.to(roomId).emit('roomInfo', thisRoom);
         };
-        if(!roomMember[roomId].includes(userName)){
-            roomMember[roomId].push(userName);
-        };
-        roomScore[userName] = 0;
-        if (typeof roomInfo[roomId] == 'undefined'){
-            roomInfo[roomId] = 'waiting';
-        };
-        io.emit('lobby', roomInfo, roomMember, roomMaxMember, roomPublic);
-        io.to(socket.id).emit('roomMaxScore', roomMaxScore[roomId]);
-        io.to(roomId).emit('connectToRoom', `${userName}加入了！`);
-        io.to(roomId).emit('member', roomMember[roomId]);
-        io.to(roomId).emit('score', roomScore);
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
     });
 
     socket.on("disconnect", () => {
-        roundChange[leaveRoomId] = false;
-        const leaveUser = roomMember[leaveRoomId];
-        const leaveRound = roomDraw[leaveRoomId];
-        if (typeof(roomMember[leaveRoomId]) != 'undefined'){
-            if (userName == leaveUser[leaveRound]){
-                roundChange[leaveRoomId] =true;
+        let thisRoom = allRoomInfo[leaveRoomId];
+        if (typeof(thisRoom) != 'undefined'){
+            if (typeof(thisRoom.roomMember) != 'undefined'){
+                const index = thisRoom.roomMember.indexOf(userName);
+                if (index !== -1) {
+                    thisRoom.roomMember.splice(index, 1);
+                };
+                if (thisRoom.roomStatus != 'ending'){
+                    if (thisRoom.roomDraw == thisRoom.roomMember.length){
+                        thisRoom.roomDraw = 0;
+                        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
+                    };
+                    if (userName == thisRoom.drawer){
+                        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw]
+                    };
+                    
+                    if (userName == thisRoom.host){
+                        thisRoom.host = thisRoom.roomMember[0];
+                    };
+                    if (thisRoom.correctNum +1 >= thisRoom.roomMember.length){
+                        thisRoom.correctNum = 0;
+                        clearInterval(timers[leaveRoomId]);
+                        clearInterval(restTimers[leaveRoomId]);
+                        delete timers[leaveRoomId];
+                        delete restTimers[leaveRoomId];
+                        thisRoom.roomStatus = 'resting';
+                        if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
+                            thisRoom.roomDraw = 0;
+                        }else{
+                            thisRoom.roomDraw ++;
+                        };
+                        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
+                        allRoomInfo[leaveRoomId] = thisRoom;
+                        io.to(leaveRoomId).emit('everyoneCorrected');
+                        io.to(leaveRoomId).emit('nextDrawer', thisRoom.drawer);
+                    };
+                    if (thisRoom.roomMember.length == 1){
+                        clearInterval(timers[leaveRoomId]);
+                        clearInterval(restTimers[leaveRoomId]);
+                        delete timers[leaveRoomId];
+                        delete restTimers[leaveRoomId];
+                        thisRoom.correctNum = 0;
+                        thisRoom.roomStatus = 'waiting';
+                    };
+                    allRoomInfo[leaveRoomId] = thisRoom;
+                };
+                
+                if (thisRoom.roomMember.length == 0){
+                    delete allRoomInfo[leaveRoomId];
+                    clearInterval(timers[leaveRoomId]);
+                    clearInterval(restTimers[leaveRoomId]);
+                    delete timers[leaveRoomId];
+                    delete restTimers[leaveRoomId];
+                    delete roomScore.userName;
+                };
             };
-            const index = roomMember[leaveRoomId].indexOf(userName);
-            if (index !== -1) {
-            roomMember[leaveRoomId].splice(index, 1);
+            if (typeof(userName) != 'undefined'){
+                io.to(leaveRoomId).emit('leaveRoom', `${userName}離開了！`);
             };
-            if (roomMember[leaveRoomId].length == 1){
-                roomInfo[leaveRoomId] = 'waiting';
-            }
-            if (roomMember[leaveRoomId].length == 0){
-                delete roomInfo[leaveRoomId];
-                delete roomMaxMember[leaveRoomId];
-                delete roomMaxScore[leaveRoomId];
-                delete roomPublic[leaveRoomId];
-                delete roomMember[leaveRoomId];
-                delete roomScore[userName];
-                delete roomDraw[leaveRoomId];
-                delete roundChange[leaveRoomId];
-                delete topic[leaveRoomId];
-            };
+            socket.leave(leaveRoomId); 
+            io.emit('lobby', allRoomInfo);
+            io.to(leaveRoomId).emit('member', thisRoom.roomMember);
+            io.to(leaveRoomId).emit('score', roomScore);
+            io.to(leaveRoomId).emit('roomInfo', thisRoom);
         };
-        if (typeof(userName) != 'undefined'){
-            io.to(leaveRoomId).emit('leaveRoom', `${userName}離開了！`);
-        };
-        socket.leave(leaveRoomId); 
-        io.emit('lobby', roomInfo, roomMember, roomMaxMember, roomPublic);
-        io.to(leaveRoomId).emit('member', roomMember[leaveRoomId]);
-        io.to(leaveRoomId).emit('score', roomScore);
-        io.to(leaveRoomId).emit('roomStatus', roomInfo[leaveRoomId], roomMember[leaveRoomId], roomDraw[leaveRoomId], topic[leaveRoomId], roundChange[leaveRoomId]);
     });
 
     //聊天室
-    socket.on('guess', (msg, roomId) => {
-        io.to(roomId).emit('guess', msg, userName);
+    socket.on('guess', (msg, roomId, win) => {
+        io.to(roomId).emit('guess', msg, win);
     });
 
     socket.on('chat', (msg, roomId) => {
         io.to(roomId).emit('chat', msg, userName);
-    });
-
-    socket.on('nextDraw', (roomId) => {
-        let users = roomMember[roomId];
-        let round = roomDraw[roomId];
-        io.to(roomId).emit('nextDraw', users[round]);
     });
 
     socket.on('lose', (roomId, topic) => {
@@ -194,92 +239,162 @@ io.on('connection', (socket) => {
 
     //遊戲流程
     socket.on('beginGame', (roomId) => {
-        roundChange[roomId] = true;
-        roomRound[roomId] = 1;
-        roomInfo[roomId] = 'playing';
-        roomDraw[roomId] = 0;
-        if (!topicIndex[roomId]){
-            topicIndex[roomId] = [];
+        let thisRoom = allRoomInfo[roomId];
+        thisRoom.roomRound = 1;
+        thisRoom.roomStatus = 'playing';
+        if (!thisRoom.topicIndex){
+            thisRoom.topicIndex = [];
         };
         let str='';
-        topicIndex[roomId] = [];
+        thisRoom.topicIndex = [];
         for(i=0; i<topicsLength; i++){
             str = Math.round(Math.random()*topicsLength);
-            for(j=0;j<topicIndex[roomId].length;j++){
-                    if(topicIndex[roomId][j] == str){
-                        topicIndex[roomId].splice(j,1);
+            for(j=0;j<thisRoom.topicIndex.length;j++){
+                    if(thisRoom.topicIndex[j] == str){
+                        thisRoom.topicIndex.splice(j,1);
                         i--;
                     };
-                    if(topicIndex[roomId][j] == topicsLength){
-                        topicIndex[roomId].splice(j,1);
+                    if(thisRoom.topicIndex[j] == topicsLength){
+                        thisRoom.topicIndex.splice(j,1);
                     };
                 };
-            topicIndex[roomId].push(str);
+            thisRoom.topicIndex.push(str);
         };
-        let round = roomRound[roomId];
-        topic[roomId] = topics[topicIndex[roomId][round]];
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
+        thisRoom.topic = topics[thisRoom.topicIndex[thisRoom.roomRound]];
+        allRoomInfo[roomId] = thisRoom;
+        io.to(roomId).emit('roomInfo', thisRoom);
     });
 
     socket.on('win', (roomId, user) => {
-        roomInfo[roomId] = 'resting';
-        roundChange[roomId] = true;
-        roomRound[roomId] ++;
-        let Users = roomMember[roomId];
-        let round = roomDraw[roomId];
-        let drawUser = Users[round];
-        roomScore[drawUser] ++;
+        let thisRoom = allRoomInfo[roomId];
+
+        roomScore[thisRoom.drawer] ++;
         roomScore[user] +=2;
-        if (roomScore[drawUser] >= roomMaxScore[roomId]){
-            roomInfo[roomId] = 'ending';
-            io.to(roomId).emit('winnerDraw', drawUser)
-        };
-        if (roomScore[user] >= roomMaxScore[roomId]){
-            roomInfo[roomId] = 'ending';
+        io.to(roomId).emit('winScore', roomScore[user], user, roomScore[thisRoom.drawer], thisRoom.drawer);
+        
+        thisRoom.correctNum ++;
+        if (roomScore[thisRoom.drawer] >= thisRoom.roomMaxScore){
+            clearInterval(timers[roomId]);
+            clearInterval(restTimers[roomId]);
+            delete timers[roomId];
+            delete restTimers[roomId];
+            thisRoom.roomStatus = 'ending';
+            io.to(roomId).emit('winnerDraw', thisRoom.drawer)
+            allRoomInfo[roomId] = thisRoom;
+            io.to(roomId).emit('roomInfo', thisRoom);
+        } else if (roomScore[user] >= thisRoom.roomMaxScore){
+            clearInterval(timers[roomId]);
+            clearInterval(restTimers[roomId]);
+            delete timers[roomId];
+            delete restTimers[roomId];
+            thisRoom.roomStatus = 'ending';
             io.to(roomId).emit('winnerUser', user)
-        };
-        if (typeof(roomMember[roomId]) != 'undefined'){
-            if (roomDraw[roomId]+1 == roomMember[roomId].length){
-                roomDraw[roomId] = 0;
+            allRoomInfo[roomId] = thisRoom;
+            io.to(roomId).emit('roomInfo', thisRoom);
+        }else if (thisRoom.correctNum +1 >= thisRoom.roomMember.length){
+            thisRoom.correctNum = 0;
+            clearInterval(timers[roomId]);
+            clearInterval(restTimers[roomId]);
+            delete timers[roomId];
+            delete restTimers[roomId];
+            thisRoom.roomStatus = 'resting';
+            if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
+                thisRoom.roomDraw = 0;
             }else{
-                roomDraw[roomId] ++;
+                thisRoom.roomDraw ++;
             };
+            thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
+            allRoomInfo[roomId] = thisRoom;
+            io.to(roomId).emit('roomInfo', thisRoom);
+            io.to(roomId).emit('everyoneCorrected');
+            io.to(roomId).emit('nextDrawer', thisRoom.drawer);
         };
-        let nextRound = roomRound[roomId];
-        topic[roomId] = topics[topicIndex[roomId][nextRound]];
-        io.to(roomId).emit('winScore', roomScore[user], user, roomScore[drawUser], drawUser);
-        io.to(roomId).emit('winMessage', user);
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
     });
 
-    socket.on('nextRound', (roomId) => {
-        roomInfo[roomId] = 'resting';
-        roundChange[roomId] = true;
-        roomRound[roomId] ++;
-        if (typeof(roomMember[roomId]) != 'undefined'){
-            if (roomDraw[roomId]+1 == roomMember[roomId].length){
-                roomDraw[roomId] = 0;
-            }else{
-                roomDraw[roomId] ++;
+    socket.on('startTimer', (roomId) => {
+        let count = 100;
+        let min = 1/60;
+        if (!timers[roomId]){
+            timer = setInterval(() =>{
+            count -= min;
+            io.to(roomId).emit('timer', count);
+            if (count <= 0) {
+                clearInterval(timers[roomId]);
+                delete timers[roomId];
+                count = 100;
+                let thisRoom = allRoomInfo[roomId];
+                thisRoom.roomStatus = 'resting';
+                if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
+                    thisRoom.roomDraw = 0;
+                }else{
+                    thisRoom.roomDraw ++;
+                };
+                thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
+                allRoomInfo[roomId] = thisRoom;
+                io.to(roomId).emit('roomInfo', thisRoom);
+                io.to(roomId).emit('nextDrawer', thisRoom.drawer);
             };
+        }, 10);
+        }
+        timers[roomId] = timer;
+    });
+
+    socket.on('stopTimer', (roomId) => {
+        clearInterval(timers[roomId]);
+        delete timers[roomId];
+        count = 100;
+        let thisRoom = allRoomInfo[roomId];
+        thisRoom.roomStatus = 'resting';
+        if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
+            thisRoom.roomDraw = 0;
+        }else{
+            thisRoom.roomDraw ++;
         };
-        let round = roomRound[roomId];
-        topic[roomId] = topics[topicIndex[roomId][round]];
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
+        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
+        allRoomInfo[roomId] = thisRoom;
+        io.to(roomId).emit('roomInfo', thisRoom);
+        io.to(roomId).emit('nextDrawer', thisRoom.drawer);
     });
 
-    socket.on('startRound', (roomId) => {
-        roomInfo[roomId] = 'playing';
-        io.to(roomId).emit('roomStatus', roomInfo[roomId], roomMember[roomId], roomDraw[roomId], topic[roomId], roundChange[roomId]);
+    socket.on('startRestTimer', (roomId) => {
+        let restCount = 100;
+        let restMin = 1/8;
+        if (!restTimers[roomId]){
+            restTimer = setInterval(() =>{
+            restCount -= restMin;
+            if (restCount <= 0) {
+                clearInterval(restTimers[roomId]);
+                delete restTimers[roomId];
+                restCount = 100;
+                let thisRoom = allRoomInfo[roomId];
+                thisRoom.roomStatus = 'playing';
+                thisRoom.roomRound ++;
+                thisRoom.topic = topics[thisRoom.topicIndex[thisRoom.roomRound]];
+                allRoomInfo[roomId] = thisRoom;
+                io.to(roomId).emit('roomInfo', thisRoom);
+                io.to(roomId).emit('drawer', thisRoom.drawer);
+                io.to(roomId).emit('stopRestTimer');
+                };
+            }, 10);
+        };
+        restTimers[roomId] = restTimer;
     });
 
-    socket.on('getTime', (roomId, count) => {
-        socket.broadcast.to(roomId).emit('getTime', count);
+    socket.on('refresh', (roomId) => {
+        let thisRoom = allRoomInfo[roomId];
+        thisRoom.roomStatus = 'waiting';
+        thisRoom.roomDraw = 0;
+        thisRoom.correctNum = 0;
+        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
+        for (let i = 0; i<thisRoom.roomMember.length; i++) {
+            roomScore[thisRoom.roomMember[i]] = 0;
+        };
+        delete thisRoom.topic;
+        allRoomInfo[roomId] = thisRoom;
+        io.to(roomId).emit('member', thisRoom.roomMember);
+        io.to(roomId).emit('score', roomScore);
+        io.to(roomId).emit('roomInfo', thisRoom);
     });
-
-    socket.on('stopTime', (roomId) => {
-        socket.broadcast.to(roomId).emit('stopTime');
-    })
 });
 
 server.listen(port, () => {

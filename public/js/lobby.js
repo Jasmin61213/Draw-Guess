@@ -29,20 +29,19 @@ create.addEventListener('click', (e) => {
     });
 });
 
-socket.on('lobby', async(roomInfo, roomMember, roomMax, roomPublic) => {
+socket.on('lobby', (allRoomInfo) => {
     const block = document.querySelectorAll(".block");
     for (i = 0; i<block.length; i++){
         block[i].remove();
     };
-    const allRoomId = Object.keys(roomInfo); 
-    const allRoomInfo = Object.values(roomInfo); 
-    const allRoomMember = Object.values(roomMember); 
-    const allRoomMax = Object.values(roomMax); 
-    const allRoomPublic = Object.values(roomPublic); 
+    const allRoomId = Object.keys(allRoomInfo); 
+    const allRoomMember = Object.values(allRoomInfo).map(item => item.roomMember);
+    const allRoomMax = Object.values(allRoomInfo).map(item => item.roomMaxMember);
+    const allRoomPublic = Object.values(allRoomInfo).map(item => item.roomPublic);
     if (!allRoomPublic.includes('public')){
         noRoom.style.display = 'block';
     }else{
-        for (let i=0; i<allRoomInfo.length; i++){
+        for (let i=0; i<allRoomId.length; i++){
             noRoom.style.display = 'none';
             const roomBlock = document.createElement('a');
             const roomOwner = document.createElement('div');

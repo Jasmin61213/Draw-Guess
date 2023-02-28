@@ -39,6 +39,7 @@ button{
 }
 
 .wrap-all{
+    position: relative;
     /* display: flex;
     justify-content: center; */
     margin-top: 100px;
@@ -52,11 +53,32 @@ button{
     border-width: 1.5px;
 }
 
-.title-text{
-    text-align: center;
-    font-size: 24px;
+.name{
+    cursor: pointer;
+    position: absolute;
+    top: 13px;
+    right: 60px;
+    font-size: 22px;
     color: #65524D;
-    padding: 15px 0 15px 0;
+}
+
+.title-text{
+    font-family: 'Rowdies', cursive;
+    text-align: center;
+    font-size: 28px;
+    color: #65524D;
+    padding: 15px 0 11px 0;
+
+}
+
+.logout{
+    cursor: pointer;
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    /* font-size: 20px; */
+    width: 36px;
+    color: #65524D;
 }
 
 .wrap{
@@ -242,4 +264,100 @@ input[type="radio"]{
     font-size: 24px;
     color: #65524D;
     padding: 10px 0 15px 0;
+}
+
+.change{
+    display: none;
+    position: absolute;
+    z-index: 1;
+    top: 50px;
+    right: 55px;
+    background-color: #ECE2D0;
+    width: 320px;
+    height: 200px;
+    border-radius: 15px;
+    border-color:#65524D;
+    border-style: solid;
+    border-width: 5px;
+    box-shadow: 1px 1px 2px  #b4b4b4;
+}
+
+.change-close{
+    cursor: pointer;
+    position: absolute;
+    width: 24px;
+    top: 10px;
+    right: 10px;
+}
+
+.change-text{
+    margin: 12px 0 10px 0;
+    font-size: 28px;
+    color: #65524D;
+    text-align: center;
+}
+
+.change-input{
+    width: 250px;
+    margin: 8px 0 2px 28px;
+    border: 0;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #ece2d0;
+    border-radius: 10px;
+    height: 32px;
+    padding: 0 0 0 10px;
+    font-size: 20px;
+    color: #65524D;
+}
+
+input:focus{
+    outline: none;
+}
+
+.alert{
+    height: 23px;
+    text-align: center;
+    color: #65524D;
+}
+
+.change-button{
+    cursor: pointer;
+    position: absolute;
+    font-family: 'Rowdies', cursive;
+    font-size: 24px;
+    margin-top: 5px;
+    left: 110px;
+    width: 100px;
+    height: 40px;
+    color: #fff;
+    background-color: #d3a588;
+    border-radius: 5px;
+}
+.change-button:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
+}
+
+.footer{
+    padding-right: 24px;
+    position: relative;
+    margin-top: 45px;
+    color: #65524D;
+    text-align: center;
+    font-family: 'Rowdies', cursive;
+    font-size: 18px;
+    height: 24px;
+    line-height: 24px;
+}
+
+.github{
+    cursor: pointer;
+    position: absolute;
+    top: 0px;
+    right: 290px;
+    /* padding-top: 5px; */
+    margin-left: 10px;
+    width: 24px;
 }

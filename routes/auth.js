@@ -45,6 +45,8 @@ router.post('/signup',async(req, res) => {
     try{
         if (email == '' || password == '' || username == ''){
             res.status(400).json({'error':true,'message':'請輸入資料'});
+        }else if (username.length > 7) {
+            res.status(400).json({'error':true,'message':'暱稱不得大於八個字'});
         }else{
             const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             const isEmailValid = emailRegex.test(email);
@@ -65,7 +67,6 @@ router.post('/signup',async(req, res) => {
     };
 });
 
-
 router.get('/getLogin',async(req, res) => {
     const user = req.session.user;
     if (typeof(user) == 'undefined'){
@@ -75,6 +76,29 @@ router.get('/getLogin',async(req, res) => {
             'ok':true,
             'user':user
         });
+    };
+});
+
+router.delete('/logout',async(req, res) => {
+    req.session.destroy();
+    res.status(200).json({
+        'ok':true,
+    });
+});
+
+router.post('/changeName',urlencodedParser,async(req, res) => {
+    const oldname = req.body.oldName;
+    const newname = req.body.newName;
+    try{
+        if (newname.length > 7){
+            res.status(400).json({error:true,'message':'暱稱不能大於八個字'})
+        }else{
+            const changeName = await pool.execute('UPDATE user SET username= ? WHERE username= ?', [newname, oldname]);
+            req.session.user = newname;
+            res.status(200).json({'ok':true,'user':newname});
+        };
+    }catch{
+        res.status(500).json({error:true})
     };
 });
 

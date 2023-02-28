@@ -1,5 +1,25 @@
 const socket = io();
 
+//驗證登入者
+let user;
+async function login(){
+    const response = await fetch('/api/auth/getLogin');
+    const res = await response.json();
+    if (res.ok == true){
+        user = res.user;
+        console.log(res.user)
+        document.querySelector('.name').textContent = res.user;
+    };
+    if (res.error == true){
+        window.location.href = '/';
+    };
+};
+if (document.readyState === "complete"){
+    login();
+}else{
+    document.addEventListener("DOMContentLoaded", login);
+};
+
 socket.emit('getRoom');
 
 const newRoom = document.querySelector('.button');
@@ -7,11 +27,68 @@ const create = document.querySelector('.remind-button');
 const set = document.querySelector('.remind');
 const wrap = document.querySelector('.wrap');
 const noRoom = document.querySelector('.no-room');
+const change = document.querySelector('.change');
+const userName = document.querySelector('.name');
+
+document.querySelector('.logout').addEventListener('click', (e) => {
+    e.preventDefault();
+    async function logout(){
+        const response = await fetch('/api/auth/logout',{
+            method : 'DELETE'
+        });
+        const res = await response.json();
+        if (res.ok == true){
+            window.location.href = '/';
+        };
+    };
+    logout();
+});
+
+userName.addEventListener('click', (e) => {
+    e.preventDefault();
+    change.style.display = 'block';
+});
+
+document.querySelector('.change-close').addEventListener('click', (e) => {
+    e.preventDefault();
+    change.style.display = 'none';
+    document.querySelector('.alert').textContent = '';
+});
+
+document.querySelector('.change-button').addEventListener('click', (e) => {
+    e.preventDefault();
+    let inputName = document.getElementById('change-name').value;
+    data = {
+        'oldName' : user,
+        'newName': inputName
+    }
+    async function changeName(){
+        const response = await fetch('/api/auth/changeName', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            cache: "no-cache",
+            headers:{
+            "Accept" : "application/json",
+            "Content-Type" : "application/json"
+            }
+        });
+        const res = await response.json();
+        if (res.ok == true){
+            document.querySelector('.name').textContent = res.user;
+            change.style.display = 'none';
+        };
+        if (res.error == true){
+            document.querySelector('.alert').textContent = res.message;
+        };
+        document.getElementById('change-name').value = '';
+    };
+    changeName()
+});
 
 document.querySelector('.close').addEventListener('click', (e) => {
     e.preventDefault();
     set.style.display = 'none';
-})
+});
 
 newRoom.addEventListener('click', (e) => {
     e.preventDefault();
@@ -52,7 +129,7 @@ socket.on('lobby', (allRoomInfo) => {
                     roomMemberBlock.textContent = '額滿';
                     roomMemberBlock.className = 'memberText';
                 }else{
-                    roomMemberBlock.textContent = '人數：'+ allRoomMember[i].length;
+                    roomMemberBlock.textContent = `人數：${allRoomMember[i].length} / ${allRoomMax[i]}`;
                     roomMemberBlock.className = 'memberText';
                     roomBlock.href = '/draw?room='+allRoomId[i];
                 }

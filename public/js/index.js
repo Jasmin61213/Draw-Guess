@@ -2,11 +2,25 @@ const remind = document.querySelector('.remind');
 const remindText = document.querySelector('.remind-text');
 const remindButton = document.querySelector('.remind-button');
 
+//驗證登入者
+let user;
+async function login(){
+    const response = await fetch('/api/auth/getLogin');
+    const res = await response.json();
+    if (res.ok == true){
+        window.location.href = '/lobby';
+    };
+};
+if (document.readyState === "complete"){
+    login();
+}else{
+    document.addEventListener("DOMContentLoaded", login);
+};
+
 remindButton.addEventListener('click', (e) => {
     e.preventDefault();
     remind.style.display = 'none';
 });
-
 
 function signIn(){
     let email = document.getElementById('email').value;

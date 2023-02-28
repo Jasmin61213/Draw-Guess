@@ -321,7 +321,7 @@ canvas{
     position: absolute;
     top: 80px;
     width: 800px;
-    height: 480px;
+    height: 484px;
 }
 
 .rest{
@@ -513,13 +513,15 @@ canvas{
 .memberName{
     /* font-family: 'Rowdies', cursive; */
     /* font-family: 'Noto Sans TC', sans-serif; */
-    /* width: 95px; */
+    width: 95px;
     font-weight: 1000;
     text-align: center;
     margin: 8px 0 0 0px;
     font-size: 24px;
     color: #65524D;
-    overflow: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space:nowrap;
 }
 
 .memberScore{
@@ -951,4 +953,28 @@ input:focus{
     transition-duration: 0.4s;
     background-color: #d3a588d3;
     box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
+}
+
+.footer{
+    width: 1200px;
+    margin: 0px auto;
+    padding-right: 24px;
+    position: relative;
+    margin-top: -5px;
+    margin-bottom: 20px;
+    color: #65524D;
+    text-align: center;
+    font-family: 'Rowdies', cursive;
+    font-size: 18px;
+    height: 24px;
+    line-height: 24px;
+}
+
+.github{
+    cursor: pointer;
+    position: absolute;
+    top: 0px;
+    right: 502px;
+    /* margin-left: 10px; */
+    width: 24px;
 }

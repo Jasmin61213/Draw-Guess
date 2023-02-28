@@ -12,6 +12,7 @@ async function login(){
     const res = await response.json();
     if (res.ok == true){
         socket.emit('joinRoom', roomId);
+        socket.emit('getTimer', roomId);
         user = res.user;
         game();
     }else{
@@ -39,9 +40,43 @@ function game(){
     const winnerDiv = document.querySelector('.win');
     const refresh = document.querySelector('.refresh');
     let topic;
+    let getTimerId;
     let timerId;
     let restTimerId;
+    const getTimerIds = {};
+    const timerIds = {};
     const restTimerIds = {};
+
+    socket.on('getTimer' , (count, restCount,roomStatus) => {
+        // let count = 100;
+        let getCount;
+        let getMin;
+        if (roomStatus == 'playing'){
+            getCount = count;
+            getMin = 1/64;
+        };
+        if (roomStatus == 'resting'){
+            getCount = restCount;
+            getMin = 1/8;
+        };
+        // let getMin = 1/64;
+        // let getMin = 0.1;
+        if (!getTimerIds[roomId]){
+        getTimerId = setInterval(() =>{
+            getCount -= getMin;
+            if (getCount <= 0) {
+                clearInterval(getTimerId);
+                delete getTimerIds[roomId];
+                // clearCanvas();
+                // getCount = 100;
+            };
+            time.style.width = getCount + '%';
+            }, 10);
+        };
+        getTimerIds[roomId] = getTimerId;
+    });
+
+
 
     socket.on('roomMaxScore', (maxScore) => {
         const guessItem = document.createElement('li');
@@ -51,9 +86,9 @@ function game(){
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
 
-    socket.emit('roomInfo', roomId);
+    // socket.emit('roomInfo', roomId);
     socket.on('roomInfo', (thisRoomInfo) => {
-        // console.log(thisRoomInfo);
+        console.log(thisRoomInfo);
         if (thisRoomInfo.roomStatus == 'waiting'){
             look.style.display = 'none';
             startBlock.style.display = 'block';
@@ -73,9 +108,9 @@ function game(){
             };
         };
         if (thisRoomInfo.roomStatus == 'playing'){
-            if (user == thisRoomInfo.host){
-                socket.emit('startTimer', roomId);
-            };  
+            // if (user == thisRoomInfo.host){
+            //     socket.emit('startTimer', roomId);
+            // };  
             look.style.display = 'block';
             restDiv.style.display = 'none';
             guessInput.value = '';
@@ -103,24 +138,24 @@ function game(){
                 topicDiv.style.display = 'block';
                 guessInput.setAttribute('disabled', 'disabled'); 
                 guessInput.style.cursor = 'not-allowed';
-                socket.on('timer', (roomTime) => {
-                    time.style.width = roomTime + '%';
-                });
+                // socket.on('timer', (roomTime) => {
+                //     time.style.width = roomTime + '%';
+                // });
             }else{
                 chatInput.removeAttribute('disabled', 'disabled');
                 penChanged.style.display = 'none';
                 topicDiv.style.display = 'none';
                 guessInput.removeAttribute('disabled', 'disabled');
                 guessInput.style.cursor = 'auto';
-                socket.on('timer', (roomTime) => {
-                    time.style.width = roomTime + '%';
-                });
+                // socket.on('timer', (roomTime) => {
+                //     time.style.width = roomTime + '%';
+                // });
             };
         };
         if (thisRoomInfo.roomStatus == 'resting'){
-            if (user == thisRoomInfo.host){
-                socket.emit('startRestTimer', roomId);
-            };
+            // if (user == thisRoomInfo.host){
+            //     socket.emit('startRestTimer', roomId);
+            // };
             clearCanvas();
             chatInput.removeAttribute('disabled', 'disabled');
             restDiv.style.display = 'block';
@@ -131,27 +166,27 @@ function game(){
             topicDiv.style.display = 'block';
             guessInput.setAttribute('disabled', 'disabled'); 
             guessInput.style.cursor = 'not-allowed';
-            let restCount = 100;
-            let restMin = 1/8;
-            if (!restTimerIds[roomId]){
-                restTimerId = setInterval(() =>{
-                restCount -= restMin;
-                if (restCount <= 0) {
-                    clearInterval(restTimerId);
-                    delete restTimerIds[roomId];
-                    clearCanvas();
-                    restCount = 100;
-                    };
-                time.style.width = restCount + '%';
-                }, 10);
-            };
-            socket.on('stopRestTimer', () => {
-                clearInterval(restTimerIds[roomId]);
-                delete restTimerIds[roomId];
-                clearCanvas();
-                restCount = 100;
-            });
-            restTimerIds[roomId] = restTimerId;
+            // let restCount = 100;
+            // let restMin = 1/8;
+            // if (!restTimerIds[roomId]){
+            //     restTimerId = setInterval(() =>{
+            //     restCount -= restMin;
+            //     if (restCount <= 0) {
+            //         clearInterval(restTimerId);
+            //         delete restTimerIds[roomId];
+            //         clearCanvas();
+            //         restCount = 100;
+            //         };
+            //     time.style.width = restCount + '%';
+            //     }, 10);
+            // };
+            // socket.on('stopRestTimer', () => {
+            //     clearInterval(restTimerIds[roomId]);
+            //     delete restTimerIds[roomId];
+            //     clearCanvas();
+            //     restCount = 100;
+            // });
+            // restTimerIds[roomId] = restTimerId;
         };
         if (thisRoomInfo.roomStatus == 'ending'){
             clearCanvas();
@@ -167,6 +202,80 @@ function game(){
                 refresh.style.display = 'block';
             };
         };
+    });
+
+    //計時器
+    socket.on('startTimer', (roomStatus, host) => {   
+        if (roomStatus == 'playing'){
+            console.log('timer')
+            if (user == host){
+                console.log('host')
+                socket.emit('startTimer', roomId);
+            };
+            let count = 100;
+            let min = 1/64;
+            // let min = 0.1;
+            if (!timerIds[roomId]){
+                timerId = setInterval(() =>{
+                count -= min;
+                // if (count <= 0) {
+                //     clearInterval(timerIds[roomId]);
+                //     delete timerIds[roomId];
+                //     clearCanvas();
+                //     count = 100;
+                // };
+                time.style.width = count + '%';
+                }, 10);
+            };
+            timerIds[roomId] = timerId;
+            // socket.on('stopTimer', () => {
+            //     clearInterval(timerIds[roomId]);
+            //     delete timerIds[roomId];
+            //     clearCanvas();
+            //     // count = 100;
+            // });
+        };
+        
+        if (roomStatus == 'resting'){
+            if (user == host){
+                socket.emit('startRestTimer', roomId);
+            };
+            let restCount = 100;
+            let restMin = 1/8;
+            if (!restTimerIds[roomId]){
+                restTimerId = setInterval(() =>{
+                restCount -= restMin;
+                // if (restCount <= 0) {
+                //     clearInterval(restTimerIds[roomId]);
+                //     delete restTimerIds[roomId];
+                //     clearCanvas();
+                //     restCount = 100;
+                //     };
+                time.style.width = restCount + '%';
+                }, 10);
+            };
+            restTimerIds[roomId] = restTimerId;
+            // socket.on('stopRestTimer', () => {
+            //     clearInterval(restTimerIds[roomId]);
+            //     delete restTimerIds[roomId];
+            //     clearCanvas();
+            //     restCount = 100;
+            // });
+        };
+    });
+
+    socket.on('stopTimer', () => {
+        clearInterval(timerIds[roomId]);
+        delete timerIds[roomId];
+        clearCanvas();
+        // count = 100;
+    });
+
+    socket.on('stopRestTimer', () => {
+        clearInterval(restTimerIds[roomId]);
+        delete restTimerIds[roomId];
+        clearCanvas();
+        // restCount = 100;
     });
 
     const winTitle = document.querySelector('.win-title');
@@ -227,6 +336,11 @@ function game(){
                 memberBlock.appendChild(right);
                 memberWrap.appendChild(memberBlock);
             };
+            // if (user == member[0]){
+            //     if (member.length != 1){
+            //         startGame.style.display = 'block';
+            //     };
+            // };
         });
     });
 
@@ -247,6 +361,7 @@ function game(){
                 chatInput.setAttribute('disabled', 'disabled');
                 socket.emit('guess', `${user}猜對了！`, roomId, true);
                 socket.emit('win', roomId, user);
+                // socket.emit('stopTimer', roomId);
             }else{
                 socket.emit('guess', `${user}猜：${guessInput.value}`, roomId, false);
             };
@@ -277,6 +392,7 @@ function game(){
     socket.on('lose', (topic) => {
         const guessItem = document.createElement('li');
         guessItem.className = 'li'
+        guessItem.style.color = '#F2542D';
         guessItem.textContent = '時間到！答案是' + topic;
         guessMessages.appendChild(guessItem);
         guessMessages.scrollTo(0, guessMessages.scrollHeight);

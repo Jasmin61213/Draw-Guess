@@ -15,19 +15,6 @@ const pool  = mysql.createPool({
 
 const promisePool = pool.promise();
 
-// // 引入模組
-// const redis = require("redis");
-// const client = redis.createClient();
-// // redis server
-// client.on("error", function(error) {
-//   console.error(error);
-// });
-
-// const promiseClient = client.promise();
-// <!-- 設置與取得 key / value -->
-// client.set("key", "value", redis.print);
-// client.get("key", redis.print);
-
 module.exports = {
     pool: promisePool,
 };

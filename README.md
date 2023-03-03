@@ -34,6 +34,10 @@ Have fun with your friends!
 ### Database
 * MySQL
 
+### Cloud Service
+* AWS EC2
+* AWS RDS
+
 ### Version Control
 * Git
 * Github

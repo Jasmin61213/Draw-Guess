@@ -2,10 +2,10 @@
 
 ### Website : https://jasmin-draw.com/
 ### Test account and password: 
-* jasmin@gmail.com/1213
-* lulu@gmail.com/1213
-* momo@gmail.com/1213
-* ray@gmail.com/1213
+* jasmin@gmail.com / 1213
+* lulu@gmail.com / 1213
+* momo@gmail.com / 1213
+* ray@gmail.com / 1213
 
 Draw-Guess can make you have fun guessing and drawing! Every round a Player is chosen to draw something for the others to guess what it is.
 The first player to achieve the goal of points will be declared the game winner.

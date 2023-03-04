@@ -19,7 +19,7 @@ Have fun with your friends!
 * Guess
 * Chat
 
-![draw7](https://user-images.githubusercontent.com/110441965/222877921-175a9ff4-0ab5-4436-9202-ddec88e37154.gif)
+![draw9](https://user-images.githubusercontent.com/110441965/222882111-2a422837-60c2-4e88-8cca-ee1e35c5b45d.gif)
 
 * Multiple Player Online
 

@@ -32,19 +32,19 @@ const sessionMiddleware = session({
 // });
 // bluebird.promisifyAll(redis.RedisClient.prototype);
 
-// const { Server } = require("socket.io");
-// const io = new Server(server);
-
 const { Server } = require("socket.io");
-const { createAdapter } = require("@socket.io/redis-adapter");
-const { createClient } = require("redis");
-
 const io = new Server(server);
 
-const pubClient = createClient();
-const subClient = pubClient.duplicate();
+// const { Server } = require("socket.io");
+// const { createAdapter } = require("@socket.io/redis-adapter");
+// const { createClient } = require("redis");
 
-io.adapter(createAdapter(pubClient, subClient));
+// const io = new Server(server);
+
+// const pubClient = createClient();
+// const subClient = pubClient.duplicate();
+
+// io.adapter(createAdapter(pubClient, subClient));
 // io.listen(3000);
 
 
@@ -83,12 +83,11 @@ let timer;
 let restTimer;
 // let count;
 const topics = [
-    // '向日葵','口紅','青蛙','光頭','西瓜','獅子','耳朵','皮卡丘','立可帶','警車',
-    // '腳踏車','鋼琴','台鐵','棉花糖','麥當勞漢堡','翻車魚','望遠鏡','相機','螞蟻','牛頭馬面',
-    // '海馬','耳機','手機','珍珠奶茶','時鐘','手錶','麥當勞薯條','馬鈴薯','番茄','菠菜',
-    '老師',
-    // '黑板','電風扇','國旗','口罩','枕頭','棉被','滅火器','警察','鴕鳥','電腦',
-    // '企鵝','老鷹','熊貓','穿山甲','袋鼠','洗衣機','電視','糖葫蘆','拉麵','火鍋','高速公路','高鐵',
+    '向日葵','口紅','青蛙','光頭','西瓜','獅子','耳朵','皮卡丘','立可帶','警車',
+    '腳踏車','鋼琴','台鐵','棉花糖','麥當勞漢堡','翻車魚','望遠鏡','相機','螞蟻','牛頭馬面',
+    '海馬','耳機','手機','珍珠奶茶','時鐘','手錶','麥當勞薯條','馬鈴薯','番茄','菠菜',
+    '老師','黑板','電風扇','國旗','口罩','枕頭','棉被','滅火器','警察','鴕鳥','電腦',
+    '企鵝','老鷹','熊貓','穿山甲','袋鼠','洗衣機','電視','糖葫蘆','拉麵','火鍋','高速公路','高鐵',
     '長頸鹿','鸚鵡','內褲','音響','安全帽','豆漿','吉他','弓箭',
     '鯨魚','紅綠燈','斑馬線','火影忍者','外星人','大隊接力','美人魚','雪人','馬桶',
     '地圖','飛機','羊入虎口','鴨嘴獸泰瑞','海綿寶寶','旋轉木馬','葡萄汁','虎頭蛇尾','仙人掌','對牛彈琴',
@@ -108,6 +107,16 @@ io.on('connection', (socket) => {
     //大廳
     socket.on('getRoom',() => {
         io.emit('lobby', allRoomInfo);
+    });
+
+    socket.on('checkRoom', (roomId) => {
+        let check;
+        if (allRoomInfo[roomId]){
+            check = true;
+        }else{
+            check = false;
+        };
+        io.to(socket.id).emit('checkRoom', check);
     });
 
     //房間
@@ -138,7 +147,7 @@ io.on('connection', (socket) => {
             };
             roomScore[userName] = 0;
             allRoomInfo[roomId] = thisRoom;
-            io.emit('lobby', allRoomInfo)
+            io.emit('lobby', allRoomInfo);
             io.to(roomId).emit('connectToRoom', `${userName}加入了！`);
             io.to(roomId).emit('member', thisRoom.roomMember);
             io.to(roomId).emit('score', roomScore);
@@ -173,7 +182,6 @@ io.on('connection', (socket) => {
                         thisRoom.host = thisRoom.roomMember[0];
                     };
                     if (userName == thisRoom.drawer){
-                        // console.log('ok')
                         thisRoom.roomStatus = 'resting';
                         if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
                             thisRoom.roomDraw = 0;
@@ -181,10 +189,10 @@ io.on('connection', (socket) => {
                             thisRoom.roomDraw ++;
                         };
                         thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
-                        // console.log(thisRoom.roomStatus)
                         allRoomInfo[leaveRoomId] = thisRoom;
                         io.to(leaveRoomId).emit('nextDrawer', thisRoom.drawer);
                         io.to(leaveRoomId).emit('stopTimer');
+                        io.to(leaveRoomId).emit('stopGetTimer');
                         io.to(leaveRoomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
                     };
                     if (thisRoom.roomDraw == thisRoom.roomMember.length){
@@ -199,6 +207,7 @@ io.on('connection', (socket) => {
                         delete restTimers[leaveRoomId];
                         io.to(leaveRoomId).emit('stopTimer');
                         io.to(leaveRoomId).emit('stopRestTimer');
+                        io.to(leaveRoomId).emit('stopGetTimer');
                         thisRoom.correctNum = 0;
                         thisRoom.roomStatus = 'waiting';
                         allRoomInfo[leaveRoomId] = thisRoom;
@@ -219,9 +228,9 @@ io.on('connection', (socket) => {
                         io.to(leaveRoomId).emit('everyoneCorrected');
                         io.to(leaveRoomId).emit('nextDrawer', thisRoom.drawer);
                         io.to(leaveRoomId).emit('stopTimer');
+                        io.to(leaveRoomId).emit('stopGetTimer');
                         io.to(leaveRoomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
                     };
-                    // allRoomInfo[leaveRoomId] = thisRoom;
                 };
                 if (thisRoom.roomStatus == 'resting'){
                     if (userName == thisRoom.host){
@@ -230,21 +239,16 @@ io.on('connection', (socket) => {
                     if (userName == thisRoom.drawer){
                         thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
                         io.to(leaveRoomId).emit('nextDrawer', thisRoom.drawer);
-                        // io.to(leaveRoomId).emit('stopTimer');
-                        // io.to(leaveRoomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
                     };
                     if (thisRoom.roomDraw == thisRoom.roomMember.length){
                         thisRoom.roomDraw = 0;
                         thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
-                        // allRoomInfo[leaveRoomId] = thisRoom;
                     };
                     if (thisRoom.roomMember.length == 1){
-                        // clearInterval(timers[leaveRoomId]);
                         clearInterval(restTimers[leaveRoomId]);
-                        // delete timers[leaveRoomId];
                         delete restTimers[leaveRoomId];
-                        // io.to(leaveRoomId).emit('stopTimer');
                         io.to(leaveRoomId).emit('stopRestTimer');
+                        io.to(leaveRoomId).emit('stopGetTimer');
                         thisRoom.correctNum = 0;
                         thisRoom.roomStatus = 'waiting';
                     };
@@ -263,13 +267,11 @@ io.on('connection', (socket) => {
                     delete timers[leaveRoomId];
                     delete restTimers[leaveRoomId];
                     delete roomScore.userName;
-                    // allRoomInfo[leaveRoomId] = thisRoom;
                 };
             };
             io.emit('lobby', allRoomInfo);
             io.to(leaveRoomId).emit('member', thisRoom.roomMember);
             io.to(leaveRoomId).emit('score', roomScore);
-            // console.log(thisRoom.roomStatus)
             io.to(leaveRoomId).emit('roomInfo', thisRoom);
         };
     });
@@ -313,22 +315,26 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('winScore', roomScore[user], user, roomScore[thisRoom.drawer], thisRoom.drawer);
         
         thisRoom.correctNum ++;
-        if (roomScore[thisRoom.drawer] >= thisRoom.roomMaxScore){
+        if (roomScore[user] >= thisRoom.roomMaxScore){
             clearInterval(timers[roomId]);
             clearInterval(restTimers[roomId]);
             delete timers[roomId];
             delete restTimers[roomId];
-            thisRoom.roomStatus = 'ending';
-            io.to(roomId).emit('winnerDraw', thisRoom.drawer);
-            allRoomInfo[roomId] = thisRoom;
-            io.to(roomId).emit('roomInfo', thisRoom);
-        }else if (roomScore[user] >= thisRoom.roomMaxScore){
-            clearInterval(timers[roomId]);
-            clearInterval(restTimers[roomId]);
-            delete timers[roomId];
-            delete restTimers[roomId];
+            io.to(roomId).emit('stopTimer');
+            io.to(roomId).emit('stopGetTimer');
             thisRoom.roomStatus = 'ending';
             io.to(roomId).emit('winnerUser', user);
+            allRoomInfo[roomId] = thisRoom;
+            io.to(roomId).emit('roomInfo', thisRoom);
+        }else if (roomScore[thisRoom.drawer] >= thisRoom.roomMaxScore){
+            clearInterval(timers[roomId]);
+            clearInterval(restTimers[roomId]);
+            delete timers[roomId];
+            delete restTimers[roomId];
+            io.to(roomId).emit('stopTimer');
+            io.to(roomId).emit('stopGetTimer');
+            thisRoom.roomStatus = 'ending';
+            io.to(roomId).emit('winnerDraw', thisRoom.drawer);
             allRoomInfo[roomId] = thisRoom;
             io.to(roomId).emit('roomInfo', thisRoom);
         }else if (thisRoom.correctNum +1 >= thisRoom.roomMember.length){
@@ -346,6 +352,7 @@ io.on('connection', (socket) => {
             thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
             allRoomInfo[roomId] = thisRoom;
             io.to(roomId).emit('stopTimer');
+            io.to(roomId).emit('stopGetTimer');
             io.to(roomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
             io.to(roomId).emit('roomInfo', thisRoom);
             io.to(roomId).emit('everyoneCorrected');
@@ -354,19 +361,15 @@ io.on('connection', (socket) => {
     });
 
     socket.on('startTimer', (roomId) => {
-        // console.log('timer')
         let count = 100;
-        // count = 100;
-        let min = 1/63;
+        let min = 1/64;
         if (!timers[roomId]){
             timer = setInterval(() =>{
                 count -= min;
                 counts[roomId] = count;
-                // io.to(roomId).emit('timer', count);
                 if (count <= 0) {
                     clearInterval(timers[roomId]);
                     delete timers[roomId];
-                    // count = 100;
                     let thisRoom = allRoomInfo[roomId];
                     thisRoom.roomStatus = 'resting';
                     if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
@@ -380,31 +383,13 @@ io.on('connection', (socket) => {
                     io.to(roomId).emit('nextDrawer', thisRoom.drawer);
                     io.to(roomId).emit('lose', thisRoom.topic);
                     io.to(roomId).emit('stopTimer');
+                    io.to(roomId).emit('stopGetTimer');
                     io.to(roomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
                 };
             }, 10);
         };
         timers[roomId] = timer;
     });
-
-    // socket.on('stopTimer', (roomId) => {
-    //     clearInterval(timers[roomId]);
-    //     delete timers[roomId];
-    //     // count = 100;
-    //     let thisRoom = allRoomInfo[roomId];
-    //     thisRoom.roomStatus = 'resting';
-    //     // if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
-    //     //     thisRoom.roomDraw = 0;
-    //     // }else{
-    //     //     thisRoom.roomDraw ++;
-    //     // };
-    //     // thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
-    //     allRoomInfo[roomId] = thisRoom;
-    //     io.to(roomId).emit('roomInfo', thisRoom);
-    //     // io.to(roomId).emit('nextDrawer', thisRoom.drawer);
-    //     io.to(roomId).emit('stopTimer');
-    //     io.to(roomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
-    // });
 
     socket.on('startRestTimer', (roomId) => {
         let thisRoom = allRoomInfo[roomId];
@@ -417,7 +402,6 @@ io.on('connection', (socket) => {
             if (restCount <= 0) {
                 clearInterval(restTimers[roomId]);
                 delete restTimers[roomId];
-                // restCount = 100;
                 thisRoom.roomStatus = 'playing';
                 thisRoom.roomRound ++;
                 thisRoom.topic = topics[thisRoom.topicIndex[thisRoom.roomRound]];
@@ -425,6 +409,7 @@ io.on('connection', (socket) => {
                 io.to(roomId).emit('roomInfo', thisRoom);
                 io.to(roomId).emit('drawer', thisRoom.drawer);
                 io.to(roomId).emit('stopRestTimer');
+                io.to(roomId).emit('stopGetTimer');
                 io.to(roomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
                 };
             }, 10);

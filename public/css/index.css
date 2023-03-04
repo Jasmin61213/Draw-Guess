@@ -20,7 +20,7 @@ button{
     display: none;
     position: absolute;
     z-index: 1;
-    top: 220px;
+    top: 80px;
     background-color: #ECE2D0;
     width: 400px;
     height: 320px;
@@ -238,6 +238,6 @@ input:focus{
     cursor: pointer;
     position: absolute;
     top: 0px;
-    right: 302px;
+    right: 270px;
     width: 24px;
 }

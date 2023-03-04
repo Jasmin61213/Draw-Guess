@@ -3,7 +3,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>大廳</title>
+        <title>Draw&Guess</title>
+        <link rel="shortcut icon" href="/image/penciltime.png" />
         <link rel="stylesheet" type="text/css" href="/css/lobby.css">
     </head>
     <body>
@@ -27,8 +28,8 @@
                     </div>
                     <div class="remind">
                         <img src="/image/close.png" class="close">
-                        <div class="remind-title">房間資訊</div>
-                        <div class="remind-text">房間最多人數
+                        <div class="remind-title">SETTING</div>
+                        <div class="remind-text">PLAYERS : 
                             <select class="select" id="max">  
                                 <!-- <option value="3">3</option> -->
                                 <option value="4">4</option>
@@ -45,7 +46,7 @@
                                 <!-- <option value="100">100</option> -->
                             </select>
                         </div>
-                        <div class="remind-text">贏家分數
+                        <div class="remind-text">SCORE : 
                             <select class="select" id="score">
                                 <!-- <option value="2">2</option> -->
                                 <!-- <option value="5">5</option> -->
@@ -62,12 +63,17 @@
                         </div>
                         <div class="radio-div">
                             <input type="radio" class="radio" name="public" value="public" checked>
-                            <label for="afternoon" class="radio-label">公開房間</label>
+                            <label for="afternoon" class="radio-label">Public</label>
                             <input type="radio" class="radio" name="public" value="privacy">
-                            <label for="afternoon" class="radio-label">私人房間</label>
+                            <label for="afternoon" class="radio-label">Private</label>
                         </div>
-                        <button class="remind-button">建立</button>
+                        <button class="remind-button">SET UP</button>
                     </div>
+                    <!-- <a class="block" href="/draw?room=1677654821852">
+                        <div class="ownerText">房主：Jasmin</div>
+                        <div class="memberText">人數：1 / 4</div>
+                        <div class="statusText">等待中...</div>
+                    </a> -->
                     <!-- <div class="block">
                     </div>
                     <div class="block">
@@ -83,8 +89,8 @@
                     <div class="block">
                     </div> -->
                 </div>
-                <button class="button">建立新房間</button>
-                <div class="footer">Copyright @ Jasmin<a href="https://github.com/Jasmin61213/Draw-Guess" target="_blank"><img src="/image/github.png" class="github"></a></div>
+                <button class="button">NEW ROOM</button>
+                <div class="footer">COPYRIGHT © 2023 Jasmin<a href="https://github.com/Jasmin61213/Draw-Guess" target="_blank"><img src="/image/github.png" class="github"></a></div>
             </div>
         </div>
     </body>

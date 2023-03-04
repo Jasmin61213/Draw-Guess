@@ -3,7 +3,6 @@ const socket = io();
 //加入房間
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get('room');
-// socket.emit('joinRoom', roomId);
 
 //驗證登入者
 let user;
@@ -47,7 +46,22 @@ function game(){
     const timerIds = {};
     const restTimerIds = {};
 
-    socket.on('getTimer' , (count, restCount,roomStatus) => {
+    socket.emit('checkRoom', roomId);
+    socket.on('checkRoom', (check) => {
+        if (!check){
+            remind.style.display = 'block';
+            document.querySelector('.remind-text').textContent = '沒有此房間';
+            document.querySelector('.ok').style.display = 'block';
+            document.querySelector('.yes').style.display = 'none';
+            document.querySelector('.no').style.display = 'none';
+            document.querySelector('.ok').addEventListener('click', (e) => {
+                e.preventDefault();
+                window.location.href = 'lobby';
+            });
+        };
+    });
+
+    socket.on('getTimer' , (count, restCount, roomStatus) => {
         // let count = 100;
         let getCount;
         let getMin;
@@ -59,16 +73,12 @@ function game(){
             getCount = restCount;
             getMin = 1/8;
         };
-        // let getMin = 1/64;
-        // let getMin = 0.1;
         if (!getTimerIds[roomId]){
         getTimerId = setInterval(() =>{
             getCount -= getMin;
             if (getCount <= 0) {
                 clearInterval(getTimerId);
                 delete getTimerIds[roomId];
-                // clearCanvas();
-                // getCount = 100;
             };
             time.style.width = getCount + '%';
             }, 10);
@@ -86,9 +96,8 @@ function game(){
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
 
-    // socket.emit('roomInfo', roomId);
     socket.on('roomInfo', (thisRoomInfo) => {
-        console.log(thisRoomInfo);
+        // console.log(thisRoomInfo);
         if (thisRoomInfo.roomStatus == 'waiting'){
             look.style.display = 'none';
             startBlock.style.display = 'block';
@@ -108,9 +117,6 @@ function game(){
             };
         };
         if (thisRoomInfo.roomStatus == 'playing'){
-            // if (user == thisRoomInfo.host){
-            //     socket.emit('startTimer', roomId);
-            // };  
             look.style.display = 'block';
             restDiv.style.display = 'none';
             guessInput.value = '';
@@ -136,27 +142,21 @@ function game(){
                 look.style.display = 'none';
                 topicDiv.textContent = '題目：' + topic;
                 topicDiv.style.display = 'block';
+                guessInput.setAttribute('placeholder','Your turn')
                 guessInput.setAttribute('disabled', 'disabled'); 
                 guessInput.style.cursor = 'not-allowed';
-                // socket.on('timer', (roomTime) => {
-                //     time.style.width = roomTime + '%';
-                // });
             }else{
+                guessInput.setAttribute('placeholder','Answer here...');
                 chatInput.removeAttribute('disabled', 'disabled');
                 penChanged.style.display = 'none';
                 topicDiv.style.display = 'none';
                 guessInput.removeAttribute('disabled', 'disabled');
                 guessInput.style.cursor = 'auto';
-                // socket.on('timer', (roomTime) => {
-                //     time.style.width = roomTime + '%';
-                // });
             };
         };
         if (thisRoomInfo.roomStatus == 'resting'){
-            // if (user == thisRoomInfo.host){
-            //     socket.emit('startRestTimer', roomId);
-            // };
             clearCanvas();
+            guessInput.setAttribute('placeholder','Answer here...');
             chatInput.removeAttribute('disabled', 'disabled');
             restDiv.style.display = 'block';
             guessInput.value = '';
@@ -166,27 +166,6 @@ function game(){
             topicDiv.style.display = 'block';
             guessInput.setAttribute('disabled', 'disabled'); 
             guessInput.style.cursor = 'not-allowed';
-            // let restCount = 100;
-            // let restMin = 1/8;
-            // if (!restTimerIds[roomId]){
-            //     restTimerId = setInterval(() =>{
-            //     restCount -= restMin;
-            //     if (restCount <= 0) {
-            //         clearInterval(restTimerId);
-            //         delete restTimerIds[roomId];
-            //         clearCanvas();
-            //         restCount = 100;
-            //         };
-            //     time.style.width = restCount + '%';
-            //     }, 10);
-            // };
-            // socket.on('stopRestTimer', () => {
-            //     clearInterval(restTimerIds[roomId]);
-            //     delete restTimerIds[roomId];
-            //     clearCanvas();
-            //     restCount = 100;
-            // });
-            // restTimerIds[roomId] = restTimerId;
         };
         if (thisRoomInfo.roomStatus == 'ending'){
             clearCanvas();
@@ -218,22 +197,10 @@ function game(){
             if (!timerIds[roomId]){
                 timerId = setInterval(() =>{
                 count -= min;
-                // if (count <= 0) {
-                //     clearInterval(timerIds[roomId]);
-                //     delete timerIds[roomId];
-                //     clearCanvas();
-                //     count = 100;
-                // };
                 time.style.width = count + '%';
                 }, 10);
             };
             timerIds[roomId] = timerId;
-            // socket.on('stopTimer', () => {
-            //     clearInterval(timerIds[roomId]);
-            //     delete timerIds[roomId];
-            //     clearCanvas();
-            //     // count = 100;
-            // });
         };
         
         if (roomStatus == 'resting'){
@@ -245,22 +212,10 @@ function game(){
             if (!restTimerIds[roomId]){
                 restTimerId = setInterval(() =>{
                 restCount -= restMin;
-                // if (restCount <= 0) {
-                //     clearInterval(restTimerIds[roomId]);
-                //     delete restTimerIds[roomId];
-                //     clearCanvas();
-                //     restCount = 100;
-                //     };
                 time.style.width = restCount + '%';
                 }, 10);
             };
             restTimerIds[roomId] = restTimerId;
-            // socket.on('stopRestTimer', () => {
-            //     clearInterval(restTimerIds[roomId]);
-            //     delete restTimerIds[roomId];
-            //     clearCanvas();
-            //     restCount = 100;
-            // });
         };
     });
 
@@ -268,14 +223,18 @@ function game(){
         clearInterval(timerIds[roomId]);
         delete timerIds[roomId];
         clearCanvas();
-        // count = 100;
     });
 
     socket.on('stopRestTimer', () => {
         clearInterval(restTimerIds[roomId]);
         delete restTimerIds[roomId];
         clearCanvas();
-        // restCount = 100;
+    });
+
+    socket.on('stopGetTimer', () => {
+        clearInterval(getTimerIds[roomId]);
+        delete getTimerIds[roomId];
+        clearCanvas();
     });
 
     const winTitle = document.querySelector('.win-title');
@@ -309,6 +268,8 @@ function game(){
     socket.on('member',(member) =>{
         socket.on('score', (score) => {
             const block = document.querySelectorAll(".memberBlock");
+            const number = document.querySelector(".member-number");
+            number.textContent = `(${member.length})`
             for (i = 0; i<block.length; i++){
                 block[i].remove();
             };
@@ -336,11 +297,6 @@ function game(){
                 memberBlock.appendChild(right);
                 memberWrap.appendChild(memberBlock);
             };
-            // if (user == member[0]){
-            //     if (member.length != 1){
-            //         startGame.style.display = 'block';
-            //     };
-            // };
         });
     });
 
@@ -361,7 +317,6 @@ function game(){
                 chatInput.setAttribute('disabled', 'disabled');
                 socket.emit('guess', `${user}猜對了！`, roomId, true);
                 socket.emit('win', roomId, user);
-                // socket.emit('stopTimer', roomId);
             }else{
                 socket.emit('guess', `${user}猜：${guessInput.value}`, roomId, false);
             };

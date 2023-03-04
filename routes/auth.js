@@ -43,10 +43,13 @@ router.post('/signup',async(req, res) => {
     const password = req.body.password;
     const hash = bcrypt.hashSync(password, salt);
     try{
+        let [[checkUsername]] = await pool.query('SELECT * FROM user WHERE username = ?', [username]);
         if (email == '' || password == '' || username == ''){
             res.status(400).json({'error':true,'message':'請輸入資料'});
         }else if (username.length > 7) {
             res.status(400).json({'error':true,'message':'暱稱不得大於八個字'});
+        }else if (checkUsername) {
+            res.status(400).json({'error':true,'message':'此暱稱已有人使用'});
         }else{
             const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             const isEmailValid = emailRegex.test(email);
@@ -93,9 +96,14 @@ router.post('/changeName',urlencodedParser,async(req, res) => {
         if (newname.length > 7){
             res.status(400).json({error:true,'message':'暱稱不能大於八個字'})
         }else{
-            const changeName = await pool.execute('UPDATE user SET username= ? WHERE username= ?', [newname, oldname]);
-            req.session.user = newname;
-            res.status(200).json({'ok':true,'user':newname});
+            let [[checkUsername]] = await pool.query('SELECT * FROM user WHERE username = ?', [oldname]);
+            if (checkUsername){
+                res.status(400).json({'error':true,'message':'此暱稱已有人使用'});
+            }else{
+                const changeName = await pool.execute('UPDATE user SET username= ? WHERE username= ?', [newname, oldname]);
+                req.session.user = newname;
+                res.status(200).json({'ok':true,'user':newname});
+            };
         };
     }catch{
         res.status(500).json({error:true})

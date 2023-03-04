@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Draw&Guess</title>
+        <link rel="shortcut icon" href="/image/penciltime.png" />
         <link rel="stylesheet" type="text/css" href="/css/draw.css">
     </head>
     <body>
@@ -41,6 +42,7 @@
                     <div class="remind-text">確定要離開遊戲嗎？</div>
                     <button class="yes">Yes</button>
                     <button class="no">No</button>
+                    <button class="ok">OK</button>
                 </div>
                 <div class="title" data-storke="Draw & Guess">Draw & Guess<img src="/image/pencil.png" class="pencil"></div>
                 <canvas id="canvas" width="800" height="480"></canvas>
@@ -68,12 +70,12 @@
                 </div>
                 <div class="rest"></div>
                 <div class="start">
-                    <div class="wait-text-host">等待其他玩家加入......</div>
-                    <div class="wait-text">等待房主開始遊戲......</div>
-                    <button class="start-button">開始遊戲</button>
+                    <div class="wait-text-host">Waiting for players......</div>
+                    <div class="wait-text">Waiting for the host to start......</div>
+                    <button class="start-button">START</button>
                 </div>
                 <div class="time"><div class="bar"></div></div>
-                <div class="member-list">Member</div>
+                <div class="member-list">Member <span class="member-number"></span></div>
                 <div class="member">
                     <!-- <div class="memberBlock"><div class="left"><img src="/image/paws.png" class="memberPic"></div><div class="right"><div class="memberName">你是我的小蘋果</div><div class="memberScore" id="Jasmin">Score：0</div></div></div> -->
                 </div>
@@ -81,12 +83,12 @@
             <div class="right">
                 <img src="/image/share.png" class="share-img">
                 <img src="/image/enter.png" class="close">
-                <div class="guess-list">Guess</div>
+                <div class="guess-list">Answers</div>
                 <div class="guess">
                     <ul id="guess-messages" class="message"></ul>
                     <form id="guess-form" action="" class="form">
                         <div class="input-div">
-                            <input id="guess-input" autocomplete="off" class="input" placeholder="請輸入答案">
+                            <input id="guess-input" autocomplete="off" class="input" placeholder="Answer here..." maxlength="50">
                             <button class="button"><img src="/image/pencillittle.png" width="26px"></button>
                         </div>
                     </form>
@@ -96,14 +98,14 @@
                     <ul id="chat-messages" class="message"></ul>
                     <form id="chat-form" action="" class="form">
                         <div class="input-div">
-                            <input id="chat-input" autocomplete="off" class="input" placeholder="請輸入訊息">
+                            <input id="chat-input" autocomplete="off" class="input" placeholder="Chat here..." maxlength="50">
                             <button class="button"><img src="/image/pencillittle.png" width="26px"></button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="footer">Copyright @ Jasmin<a href="https://github.com/Jasmin61213/Draw-Guess" target="_blank"><img src="/image/github.png" class="github"></a></div>
+        <div class="footer">COPYRIGHT © 2023 Jasmin<a href="https://github.com/Jasmin61213/Draw-Guess" target="_blank"><img src="/image/github.png" class="github"></a></div>
         <script src="/socket.io/socket.io.js"></script>
         <script src="/js/draw.js"></script>
         <script src="/js/canvas.js"></script>

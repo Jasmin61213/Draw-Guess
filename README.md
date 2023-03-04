@@ -18,11 +18,16 @@ Have fun with your friends!
 * Draw
 * Guess
 * Chat
-![draw6](https://user-images.githubusercontent.com/110441965/222877045-8df7d1fb-7de1-4b57-812a-c441c3ee3436.gif)
+
+![draw7](https://user-images.githubusercontent.com/110441965/222877921-175a9ff4-0ab5-4436-9202-ddec88e37154.gif)
+
 * Multiple Player Online
+
 ![draw5](https://user-images.githubusercontent.com/110441965/222793016-9f64a175-3c0d-4801-bb08-7a6ea7859605.gif)
+
 * Multiple Room Online
 
+![draw8](https://user-images.githubusercontent.com/110441965/222878050-14de53a5-4d04-4235-b73b-b3bd37faaed0.gif)
 
 ## Backend Technique
 ### Infrastructure

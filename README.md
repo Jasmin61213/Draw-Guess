@@ -14,14 +14,15 @@ The first player to achieve the goal of points will be declared the game winner.
 Draw-Guess also allows the player to create his own room and invite up to 50 friends sharing a link to the room.
 Have fun with your friends!
 
-![draw5](https://user-images.githubusercontent.com/110441965/222793016-9f64a175-3c0d-4801-bb08-7a6ea7859605.gif)
-
 ### Main Features
 * Draw
 * Guess
 * Chat
+![draw6](https://user-images.githubusercontent.com/110441965/222877045-8df7d1fb-7de1-4b57-812a-c441c3ee3436.gif)
 * Multiple Player Online
+![draw5](https://user-images.githubusercontent.com/110441965/222793016-9f64a175-3c0d-4801-bb08-7a6ea7859605.gif)
 * Multiple Room Online
+
 
 ## Backend Technique
 ### Infrastructure

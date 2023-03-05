@@ -1,0 +1,228 @@
+@import url('https://fonts.googleapis.com/css2?family=Rowdies&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap');
+
+body{
+    background: #ECE2D0;
+    /* font-family: 'Rowdies', cursive; */
+    font-family: 'Noto Sans TC', sans-serif;
+    margin: 0;
+}
+
+button{
+    margin: 0;
+    padding: 0;
+    outline: none;
+    border: 0;
+    background-color: #fff;
+}
+
+.remind{
+    display: none;
+    position: absolute;
+    z-index: 1;
+    top: 80px;
+    background-color: #ECE2D0;
+    width: 400px;
+    height: 320px;
+    border-radius: 15px;
+    border-color:#65524D;
+    border-style: solid;
+    border-width: 5px;
+    box-shadow: 1px 1px 2px  #b4b4b4;
+}
+
+.bitter{
+    width: 150px;
+    margin: 15px 0 -10px 125px;
+}
+
+.remind-text{
+    font-size: 32px;
+    color: #65524D;
+    text-align: center;
+}
+
+.remind-button{
+    cursor: pointer;
+    position: absolute;
+    font-family: 'Rowdies', cursive;
+    font-size: 24px;
+    margin-top: 20px;
+    left: 150px;
+    width: 100px;
+    height: 40px;
+    background-color: #d3a588;
+    border-radius: 5px;
+}
+.remind-button:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
+}
+
+.title{
+    font-family: 'Rowdies', cursive;
+    margin: 30px 0 20px 0;
+    font-size: 72px;
+    color: #d3a588;
+    text-align: center;
+}
+.title::before {
+    content: attr(data-storke);
+}
+
+.title::before {
+    position: absolute;
+    z-index: -1;
+    -webkit-text-stroke: 9px #65524D;
+    text-stroke: 9px #65524D;
+}
+
+.pencil{
+    margin-left: 10px;
+    width: 70px;
+}
+
+.wrap-all{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+    width: 800px;
+    height: 500px;
+    margin: 0px auto;
+    background-color: #fff;
+    border-radius: 15px;
+    border-color:#dadada;
+    border-style: solid;
+    border-width: 1.5px;
+}
+
+.wrap{
+    width: 300px;
+}
+
+.member{
+    margin: 10px 0 -10px 40px;
+    width: 220px;
+}
+
+.nav{
+    display: flex;
+    justify-content: center;
+}
+
+.sign-in-title{
+    cursor: pointer;
+    width: 130px;
+    margin-right: 10px;
+    margin-left: 10px;
+    flex: auto;
+    font-family: 'Rowdies', cursive;
+    font-size: 28px;
+    color: #65524D;
+    background-color: #ECE2D0;
+    border-radius: 50px;
+}
+.sign-in-title:hover{
+    background-color: #ECE2D0 !important;
+}
+
+.sign-up-title{
+    cursor: pointer;
+    width: 130px;
+    margin-right: 10px;
+    margin-left: 10px;
+    flex: none;
+    font-family: 'Rowdies', cursive;
+    font-size: 28px;
+    color: #65524D;
+    border-radius: 50px;
+}
+.sign-up-title:hover{
+    background-color: #ECE2D0 !important;
+}
+
+.title-text{
+    font-size: 24px;
+    color: #65524D;
+    margin-bottom: 10px;
+}
+
+.sign-in-input-div{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.sign-up-input-div{
+    display: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.input{
+    flex: wrap;
+    width: 250px;
+    margin: 8px 0 8px 0;
+    border: 0;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #ece2d0;
+    border-radius: 10px;
+    height: 32px;
+    padding: 0 0 0 10px;
+    font-size: 20px;
+    color: #65524D;
+}
+
+input:focus{
+    outline: none;
+}
+
+.button{
+    cursor: pointer;
+    font-family: 'Rowdies', cursive;
+    margin-top: 10px;
+    padding-bottom: 10px;
+    width: 260px;
+    border: none;
+    border-radius: 10px;
+    border-width: 2px;
+    background-color: #d3a588;
+    color: #fff;
+    height: 36px;
+    font-size: 24px;
+    line-height: 36px;
+}
+.button:hover{
+    transition-duration: 0.4s;
+    background-color: #d3a588d3;
+    box-shadow: 0 1px 1px 0 rgba(141, 141, 141, 0.738);
+}
+
+.footer{
+    width: 800px;
+    margin: 0px auto;
+    padding-right: 24px;
+    position: relative;
+    margin-top: 18px;
+    color: #65524D;
+    text-align: center;
+    font-family: 'Rowdies', cursive;
+    font-size: 18px;
+    height: 24px;
+    line-height: 24px;
+}
+
+.github{
+    cursor: pointer;
+    position: absolute;
+    top: 0px;
+    right: 270px;
+    width: 24px;
+}

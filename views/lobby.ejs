@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Draw&Guess</title>
+        <link rel="shortcut icon" href="/image/penciltime.png" />
+        <link rel="stylesheet" type="text/css" href="/css/lobby.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="title" data-storke="Draw & Guess">Draw & Guess</div>
+            <div class="wrap-all">
+                <div class="change">
+                    <img src="/image/close.png" class="change-close">
+                    <div class="change-text">更改暱稱</div>
+                    <input type="text" class="change-input" id="change-name">
+                    <div class="alert"></div>
+                    <button class="change-button">OK</button>
+                </div>
+                <div class="name"></div>
+                <div class="title-text">ROOMS</div> 
+                <img src="/image/enter.png" class="logout">
+                <div class="wrap">
+                    <div class="no-room">
+                        <img src="/image/suspicious.png" class="suspicious">
+                        <div class="no-room-text">目前沒有房間，快來建立一個吧！</div>
+                    </div>
+                    <div class="remind">
+                        <img src="/image/close.png" class="close">
+                        <div class="remind-title">SETTING</div>
+                        <div class="remind-text">PLAYERS : 
+                            <select class="select" id="max">  
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        <div class="remind-text">SCORE : 
+                            <select class="select" id="score">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                                <option value="50">50</option>
+                                <option value="60">60</option>
+                                <option value="100">100</option>
+                                <option value="150">150</option>
+                                <option value="200">200</option>
+                            </select>
+                        </div>
+                        <div class="radio-div">
+                            <input type="radio" class="radio" name="public" value="public" checked>
+                            <label for="afternoon" class="radio-label">Public</label>
+                            <input type="radio" class="radio" name="public" value="privacy">
+                            <label for="afternoon" class="radio-label">Private</label>
+                        </div>
+                        <button class="remind-button">SET UP</button>
+                    </div>
+                </div>
+                <button class="button">NEW ROOM</button>
+                <div class="footer">COPYRIGHT © 2023 Jasmin<a href="https://github.com/Jasmin61213/Draw-Guess" target="_blank"><img src="/image/github.png" class="github"></a></div>
+            </div>
+        </div>
+    </body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/lobby.js"></script>
+</html>   

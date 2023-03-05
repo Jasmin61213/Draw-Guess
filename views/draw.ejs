@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Draw&Guess</title>
+        <link rel="shortcut icon" href="/image/penciltime.png" />
+        <link rel="stylesheet" type="text/css" href="/css/draw.css">
+    </head>
+    <body>
+        <div class="content">
+            <div class="left">
+                <div class="sign-remind">
+                    <img src="/image/bitter.png" class="bitter">
+                    <div class="sign-remind-text"></div>
+                    <button class="sign-remind-button">OK</button>
+                </div>
+                <div class="nav">
+                    <button class="sign-in-title">Sign in</button>
+                    <button class="sign-up-title">Sign up</button>
+                    <div class="sign-in-input-div">
+                        <input type="text" class="sign-input" id="email" placeholder="Email">
+                        <input type="password" class="sign-input" id="password" placeholder="Password">
+                        <button class="sign-button" onclick="signIn()">Sign in</button>
+                    </div>
+                    <div class="sign-up-input-div">
+                        <input type="text" class="sign-input" id="username" placeholder="Username">
+                        <input type="text" class="sign-input" id="signup-email" placeholder="Email">
+                        <input type="password" class="sign-input" id="signup-password" placeholder="Password">
+                        <button class="sign-button" onclick="signUp()">Sign up</button>
+                    </div>
+                </div>
+                <div class="share">
+                    <img src="/image/close.png" class="share-close">
+                    <div class="share-text">複製以下連結分享給朋友，<br>邀請他們來玩吧！</div>
+                    <input type="text" class="share-input">
+                    <div class="success">連結已複製！</div>
+                    <button class="share-button">COPY</button>
+                </div>
+                <div class="remind">
+                    <img src="/image/cry.png" class="cry">
+                    <div class="remind-text">確定要離開遊戲嗎？</div>
+                    <button class="yes">Yes</button>
+                    <button class="no">No</button>
+                    <button class="ok">OK</button>
+                </div>
+                <div class="title" data-storke="Draw & Guess">Draw & Guess<img src="/image/pencil.png" class="pencil"></div>
+                <canvas id="canvas" width="800" height="480"></canvas>
+                <div class="pen">
+                    <div class="red"></div>
+                    <div class="orange"></div>
+                    <div class="yellow"></div>
+                    <div class="green"></div>
+                    <div class="blue"></div>
+                    <div class="purple"></div>
+                    <div class="pink"></div>
+                    <div class="grey"></div>
+                    <img src="/image/eraser.png" class="eraser">
+                </div>
+                <img src="/image/alarm.png" class="img">
+                <div class="topic"></div>
+                <div class="look">
+                    <div class="win">
+                        <img src="/image/win.png" class="win-img">
+                        <div class="win-title"></div>
+                        <button class="refresh">再來一場</button>
+                    </div>
+                </div>
+                <div class="rest"></div>
+                <div class="start">
+                    <div class="wait-text-host">Waiting for players......</div>
+                    <div class="wait-text">Waiting for the host to start......</div>
+                    <button class="start-button">START</button>
+                </div>
+                <div class="time"><div class="bar"></div></div>
+                <div class="member-list">Member <span class="member-number"></span></div>
+                <div class="member">
+                </div>
+            </div>
+            <div class="right">
+                <img src="/image/share.png" class="share-img">
+                <img src="/image/enter.png" class="close">
+                <div class="guess-list">Answers</div>
+                <div class="guess">
+                    <ul id="guess-messages" class="message"></ul>
+                    <form id="guess-form" action="" class="form">
+                        <div class="input-div">
+                            <input id="guess-input" autocomplete="off" class="input" placeholder="Answer here..." maxlength="50">
+                            <button class="button"><img src="/image/pencillittle.png" width="26px"></button>
+                        </div>
+                    </form>
+                </div>
+                <div class="chat-list">Chat</div>
+                <div class="chat">
+                    <ul id="chat-messages" class="message"></ul>
+                    <form id="chat-form" action="" class="form">
+                        <div class="input-div">
+                            <input id="chat-input" autocomplete="off" class="input" placeholder="Chat here..." maxlength="50">
+                            <button class="button"><img src="/image/pencillittle.png" width="26px"></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer">COPYRIGHT © 2023 Jasmin<a href="https://github.com/Jasmin61213/Draw-Guess" target="_blank"><img src="/image/github.png" class="github"></a></div>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/draw.js"></script>
+        <script src="/js/canvas.js"></script>
+        <iframe id="myIframe" name="hideIframe" style="display:none;"></iframe>    
+    </body>
+</html>

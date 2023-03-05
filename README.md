@@ -39,9 +39,11 @@ Have fun with your friends!
 
 ### Library
 * Socket.IO
+* Socket.IO/Redis adapter
 
-### Database
+### Databases
 * MySQL
+* Redis
 
 ### Cloud Service
 * AWS EC2
@@ -55,6 +57,7 @@ Have fun with your friends!
 
 ### Networking
 * Nginx
+* SSL
 
 ## Frontend Technique
 * HTML

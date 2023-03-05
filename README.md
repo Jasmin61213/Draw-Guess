@@ -61,7 +61,7 @@ Have fun with your friends!
 * HTML5 Canvas
 
 ## Backend Artictecture
-<img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/222963431-005f8f11-000f-4038-9757-38d169e68da6.png">
+<img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/222963764-ee50f194-202e-41a9-80f6-37c55aa03de0.png">
 
 ## Message Flow of Room System
 <img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/222770882-a627ff62-ca28-4919-9458-d9409ab629fc.png">

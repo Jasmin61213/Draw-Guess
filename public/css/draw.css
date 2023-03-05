@@ -317,7 +317,6 @@ canvas{
 }
 
 .look{
-    /* display: none; */
     position: absolute;
     top: 80px;
     width: 800px;
@@ -335,10 +334,6 @@ canvas{
 
 .win{
     display: none;
-    /* position: absolute;
-    top: 80px;
-    width: 800px;
-    height: 480px; */
 }
 
 .win-img{
@@ -361,9 +356,7 @@ canvas{
     top: 330px;
     left: 325px;
     cursor: pointer;
-    /* flex: none; */
     width: 150px;
-    /* padding-top: 4px; */
     border: none;
     border-radius: 5px;
     border-width: 2px;
@@ -379,7 +372,6 @@ canvas{
 }
 
 .start{
-    /* display: none; */
     position: absolute;
     top: 80px;
     width: 800px;
@@ -419,8 +411,6 @@ canvas{
     border-style: solid;
     border-width: 2px;
     font-family: 'Rowdies', cursive;
-    /* padding-top: 4px; */
-    /* border: none; */
     border-radius: 10px;
     background-color: #d3a588;
     color: #65524D;
@@ -517,8 +507,6 @@ canvas{
 }
 
 .memberName{
-    /* font-family: 'Rowdies', cursive; */
-    /* font-family: 'Noto Sans TC', sans-serif; */
     width: 95px;
     font-weight: 1000;
     text-align: center;
@@ -532,9 +520,7 @@ canvas{
 
 .memberScore{
     font-family: 'Rowdies', cursive;
-    /* font-weight: 1000; */
     text-align: center;
-    /* margin: 5px 0 0 0px; */
     font-size: 19px;
     color: #65524D;
 }
@@ -766,7 +752,6 @@ input:focus{
 }
 
 .share{
-    /* display: none; */
     position: absolute;
     z-index: 3;
     top: 200px;
@@ -1004,6 +989,5 @@ input:focus{
     position: absolute;
     top: 0px;
     right: 468px;
-    /* margin-left: 10px; */
     width: 24px;
 }

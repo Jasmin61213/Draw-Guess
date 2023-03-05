@@ -40,8 +40,6 @@ button{
 
 .wrap-all{
     position: relative;
-    /* display: flex;
-    justify-content: center; */
     margin-top: 100px;
     width: 800px;
     height: 500px;
@@ -76,7 +74,6 @@ button{
     position: absolute;
     top: 12px;
     right: 15px;
-    /* font-size: 20px; */
     width: 36px;
     color: #65524D;
 }
@@ -106,7 +103,6 @@ button{
     position: absolute;
     z-index: 1;
     font-family: 'Rowdies', cursive;
-    /* top: 0px; */
     left: 182.5px;
     background-color: #ECE2D0;
     width: 400px;
@@ -144,20 +140,14 @@ button{
 
 .select{
     font-family: 'Rowdies', cursive;
-    /* display: inline-block; */
-    /* margin-bottom: 5px; */
     width: 70px;
-    /* height: 35px; */
     font-size: 20px;
-    /* line-height: 20px; */
-    /* padding-left: 5px; */
     text-align: center;
     color: #65524D;
     text-shadow: none;
     border: 1px solid #65524D;
     border-radius: 5px;
     vertical-align:middle; margin-bottom:4px;
-    /* margin-left: 170px; */
 }
 
 .radio-div{
@@ -181,18 +171,15 @@ input[type="radio"]{
     margin-top: 15px;
     font-size: 24px;
     color: #65524D;
-    /* text-align: center; */
 }
 
 .remind-button{
     cursor: pointer;
-    /* position: absolute; */
     font-family: 'Rowdies', cursive;
     font-size: 24px;
     color: #65524D;
     margin-top: 12px;
     margin-left: 135px;
-    /* left: 150px; */
     border-color:#65524D;
     border-style: solid;
     border-width: 2px;
@@ -220,7 +207,6 @@ input[type="radio"]{
 }
 
 .block{
-    /* flex-wrap: wrap; */
     margin-bottom: 10px;
     width: 240px;
     height: 160px;
@@ -238,10 +224,7 @@ input[type="radio"]{
     border-color:#65524D;
     border-style: solid;
     border-width: 2px;
-    /* padding-top: 4px; */
-    /* border: none; */
     border-radius: 10px;
-    /* border-width: 2px 2px 2px 0; */
     background-color: #d3a588;
     color: #65524D;
     height: 40px;
@@ -376,7 +359,6 @@ input:focus{
     position: absolute;
     top: 0px;
     right: 258px;
-    /* padding-top: 5px; */
     margin-left: 10px;
     width: 24px;
 }

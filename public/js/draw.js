@@ -62,7 +62,6 @@ function game(){
     });
 
     socket.on('getTimer' , (count, restCount, roomStatus) => {
-        // let count = 100;
         let getCount;
         let getMin;
         if (roomStatus == 'playing'){
@@ -96,9 +95,9 @@ function game(){
         guessMessages.scrollTo(0, guessMessages.scrollHeight);
     });
 
-    socket.on('roomInfo', (thisRoomInfo) => {
-        // console.log(thisRoomInfo);
-        if (thisRoomInfo.roomStatus == 'waiting'){
+    socket.on('roomInfo', (roomStatus, host, roomMembers, roomTopic, roomDraw, drawer) => {
+        let roomMember = roomMembers.split(',');
+        if (roomStatus == 'waiting'){
             look.style.display = 'none';
             startBlock.style.display = 'block';
             topicDiv.style.display = 'none';
@@ -107,20 +106,20 @@ function game(){
             guessInput.setAttribute('disabled', 'disabled');
             guessInput.style.cursor = 'not-allowed';
             winnerDiv.style.display = 'none';
-            if (user == thisRoomInfo.host){
+            if (user == host){
                 startGame.style.display = 'none';
                 waitTextHost.style.display = 'block';
                 waitText.style.display = 'none';
-                if (thisRoomInfo.roomMember.length != 1){
+                if (roomMember.length != 1){
                     startGame.style.display = 'block';
                 };
             };
         };
-        if (thisRoomInfo.roomStatus == 'playing'){
+        if (roomStatus == 'playing'){
             look.style.display = 'block';
             restDiv.style.display = 'none';
             guessInput.value = '';
-            topic = thisRoomInfo.topic;
+            topic = roomTopic;
             startBlock.style.display = 'none';
             const img = document.querySelectorAll('.memberPic');
             const block = document.querySelectorAll(".memberBlock");
@@ -132,11 +131,11 @@ function game(){
                 memberName[i].style.color = '#65524D';
                 memberScore[i].style.color = '#65524D';
             };
-            img[thisRoomInfo.roomDraw].src = '/image/pencillittle-r.png';
-            block[thisRoomInfo.roomDraw].style.backgroundColor = '#9C7C6B';
-            memberName[thisRoomInfo.roomDraw].style.color = '#fff';
-            memberScore[thisRoomInfo.roomDraw].style.color = '#fff';
-            if (user == thisRoomInfo.drawer){
+            img[roomDraw].src = '/image/pencillittle-r.png';
+            block[roomDraw].style.backgroundColor = '#9C7C6B';
+            memberName[roomDraw].style.color = '#fff';
+            memberScore[roomDraw].style.color = '#fff';
+            if (user == drawer){
                 chatInput.setAttribute('disabled', 'disabled');
                 penChanged.style.display = 'block';
                 look.style.display = 'none';
@@ -154,7 +153,7 @@ function game(){
                 guessInput.style.cursor = 'auto';
             };
         };
-        if (thisRoomInfo.roomStatus == 'resting'){
+        if (roomStatus == 'resting'){
             clearCanvas();
             guessInput.setAttribute('placeholder','Answer here...');
             chatInput.removeAttribute('disabled', 'disabled');
@@ -167,7 +166,7 @@ function game(){
             guessInput.setAttribute('disabled', 'disabled'); 
             guessInput.style.cursor = 'not-allowed';
         };
-        if (thisRoomInfo.roomStatus == 'ending'){
+        if (roomStatus == 'ending'){
             clearCanvas();
             guessInput.value = '';
             penChanged.style.display = 'none';
@@ -177,7 +176,7 @@ function game(){
             guessInput.setAttribute('disabled', 'disabled'); 
             guessInput.style.cursor = 'not-allowed';
             time.style.width = '100%';
-            if (user == thisRoomInfo.host){
+            if (user == host){
                 refresh.style.display = 'block';
             };
         };
@@ -186,14 +185,11 @@ function game(){
     //計時器
     socket.on('startTimer', (roomStatus, host) => {   
         if (roomStatus == 'playing'){
-            console.log('timer')
             if (user == host){
-                console.log('host')
                 socket.emit('startTimer', roomId);
             };
             let count = 100;
             let min = 1/64;
-            // let min = 0.1;
             if (!timerIds[roomId]){
                 timerId = setInterval(() =>{
                 count -= min;
@@ -265,8 +261,9 @@ function game(){
 
     //成員列表
     const memberWrap = document.querySelector('.member')
-    socket.on('member',(member) =>{
-        socket.on('score', (score) => {
+    socket.on('member',(members) =>{
+        socket.on('score', (scores) => {
+            let member = members.split(',');
             const block = document.querySelectorAll(".memberBlock");
             const number = document.querySelector(".member-number");
             number.textContent = `(${member.length})`
@@ -289,7 +286,7 @@ function game(){
                 const memberScore = document.createElement('div');
                 memberScore.className = 'memberScore';
                 memberScore.id = member[i];
-                memberScore.textContent = 'Score：' + score[member[i]];
+                memberScore.textContent = 'Score：' + scores[member[i]];
                 left.appendChild(img)
                 right.appendChild(memberName);
                 right.appendChild(memberScore);

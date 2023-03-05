@@ -100,21 +100,10 @@ button{
 
 .wrap{
     width: 300px;
-    /* display: flex;
-    justify-content: center; */
-    /* position: relative; */
-    /* margin-top: 100px;
-    width: 800px;
-    height: 500px;
-    margin: 0px auto;
-    background-color: #fff;
-    border-radius: 15px;*/
 }
 
 .member{
     margin: 10px 0 -10px 40px;
-    /* margin-top: 30px;
-    margin-left: 50px; */
     width: 220px;
 }
 
@@ -161,21 +150,17 @@ button{
 }
 
 .sign-in-input-div{
-    /* display: none; */
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    /* display: flex; */
     margin-top: 10px;
     margin-bottom: 20px;
 }
 
 .sign-up-input-div{
     display: none;
-    /* display: flex; */
     flex-wrap: wrap;
     justify-content: center;
-    /* display: flex; */
     margin-top: 10px;
     margin-bottom: 20px;
 }

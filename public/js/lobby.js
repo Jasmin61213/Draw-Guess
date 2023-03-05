@@ -109,20 +109,23 @@ create.addEventListener('click', (e) => {
     });
 });
 
-socket.on('lobby', (allRoomInfo) => {
+socket.on('lobby', (allRoomId, allRoomMembers, allRoomMax, allRoomPublic, allRoomStatus) => {
+    console.log(allRoomId, allRoomMembers, allRoomMax, allRoomPublic, allRoomStatus)
     const block = document.querySelectorAll(".block");
     for (i = 0; i<block.length; i++){
         block[i].remove();
     };
-    const allRoomId = Object.keys(allRoomInfo); 
-    const allRoomMember = Object.values(allRoomInfo).map(item => item.roomMember);
-    const allRoomMax = Object.values(allRoomInfo).map(item => item.roomMaxMember);
-    const allRoomPublic = Object.values(allRoomInfo).map(item => item.roomPublic);
-    const allRoomStatus = Object.values(allRoomInfo).map(item => item.roomStatus);
+    // const allRoomId = Object.keys(allRoomInfo); 
+    // const allRoomMember = Object.values(allRoomInfo).map(item => item.roomMember);
+    // const allRoomMax = Object.values(allRoomInfo).map(item => item.roomMaxMember);
+    // const allRoomPublic = Object.values(allRoomInfo).map(item => item.roomPublic);
+    // const allRoomStatus = Object.values(allRoomInfo).map(item => item.roomStatus);
     if (!allRoomPublic.includes('public')){
         noRoom.style.display = 'block';
     }else{
         for (let i=0; i<allRoomId.length; i++){
+            const allRoomMember = allRoomMembers[i].split(',');
+            // console.log(allRoomMember)
             noRoom.style.display = 'none';
             const roomBlock = document.createElement('a');
             const roomOwner = document.createElement('div');
@@ -130,7 +133,7 @@ socket.on('lobby', (allRoomInfo) => {
             const roomStatusBlock = document.createElement('div');
             roomBlock.className = 'block';
             if (allRoomPublic[i]){
-                if (allRoomMember[i].length >= allRoomMax[i]){
+                if (allRoomMember.length >= allRoomMax[i]){
                     roomMemberBlock.textContent = '額滿';
                     roomMemberBlock.className = 'memberText';
                     if (allRoomStatus[i] == 'waiting'){
@@ -146,7 +149,7 @@ socket.on('lobby', (allRoomInfo) => {
                     roomBlock.style.cursor = 'not-allowed';
                     roomStatusBlock.className = 'statusText';
                 }else{
-                    roomMemberBlock.textContent = `人數：${allRoomMember[i].length} / ${allRoomMax[i]}`;
+                    roomMemberBlock.textContent = `人數：${allRoomMember.length} / ${allRoomMax[i]}`;
                     roomMemberBlock.className = 'memberText';
                     if (allRoomStatus[i] == 'waiting'){
                         roomStatusBlock.textContent = '等待中...';
@@ -164,7 +167,7 @@ socket.on('lobby', (allRoomInfo) => {
                     };
                     roomStatusBlock.className = 'statusText';
                 };
-                roomOwner.textContent = '房主：'+allRoomMember[i][0];
+                roomOwner.textContent = '房主：'+allRoomMember[0];
                 roomOwner.className = 'ownerText';
                 roomBlock.appendChild(roomOwner);
                 roomBlock.appendChild(roomMemberBlock);

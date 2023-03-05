@@ -5,11 +5,8 @@ const http = require('http');
 const server = http.createServer(app);
 
 const authRoute = require("./routes/auth");
-// const {pool} = require('./model');
 
-// require('dotenv').config();
-// const bodyParser = require('body-parser');
-// const urlencodedParser = bodyParser.urlencoded({ extended: false });
+require('dotenv').config();
 
 const session = require('express-session');
 
@@ -22,31 +19,42 @@ const sessionMiddleware = session({
     }
 });
 
-// 引入模組
-// const redis = require("redis");
-// const bluebird = require("bluebird");
-// const client = redis.createClient();
-// // redis server
-// client.on("connect", function() {
-//   console.log('redis connected!');
-// });
-// bluebird.promisifyAll(redis.RedisClient.prototype);
-
-const { Server } = require("socket.io");
-const io = new Server(server);
-
-// const { Server } = require("socket.io");
-// const { createAdapter } = require("@socket.io/redis-adapter");
-// const { createClient } = require("redis");
-
-// const io = new Server(server);
-
-// const pubClient = createClient();
-// const subClient = pubClient.duplicate();
-
-// io.adapter(createAdapter(pubClient, subClient));
-// io.listen(3000);
-
+// redis
+const redis = require("redis");
+const client = redis.createClient(
+    {url: `redis://${process.env.redis}`}
+);
+client.on("connect", function() {
+  console.log('redis connected!');
+});
+function HGET(key, field){
+    return new Promise(function(resolve, reject){
+        client.HGET(key, field, function(err, value) {
+            resolve(value);
+        });
+    });
+};
+function HGETALL(key){
+    return new Promise(function(resolve, reject){
+        client.HGETALL(key, function(err, value) {
+            resolve(value);
+        });
+    });
+};
+function HKEYS(key){
+    return new Promise(function(resolve, reject){
+        client.HKEYS(key, function(err, value) {
+            resolve(value);
+        });
+    });
+};
+function HVALS(key){
+    return new Promise(function(resolve, reject){
+        client.HVALS(key, function(err, value) {
+            resolve(value);
+        });
+    });
+};
 
 app.set('view engine', 'ejs');
 
@@ -69,12 +77,24 @@ app.get('/draw', (req, res) => {
 });
 
 //socket.io
+const { Server } = require("socket.io");
+const { createAdapter } = require("@socket.io/redis-adapter");
+const { createClient } = require("redis");
+
+const io = new Server(server);
+
+const pubClient = createClient(
+    {url: `redis://${process.env.redis}`}
+);
+const subClient = pubClient.duplicate();
+
+io.adapter(createAdapter(pubClient, subClient));
+
 const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
 
 io.use(wrap(sessionMiddleware));
 
 const allRoomInfo = {};
-const roomScore = {};
 const timers = {};
 const restTimers = {};
 const counts = {};
@@ -104,14 +124,20 @@ io.on('connection', (socket) => {
     url = socket.request.headers.referer;
     const leaveRoomId = url.split('=')[1];
 
-    //大廳
-    socket.on('getRoom',() => {
-        io.emit('lobby', allRoomInfo);
+    //lobby
+    socket.on('getRoom', async() => {
+        const allRoomId = await HKEYS('roomMember');
+        const allRoomMember = await HVALS('roomMember');
+        const allRoomMax = await HVALS('roomMaxMember');
+        const allRoomPublic = await HVALS('roomPublic');
+        const allRoomStatus = await HVALS('roomStatus');
+        io.emit('lobby', allRoomId, allRoomMember, allRoomMax, allRoomPublic, allRoomStatus);
     });
 
-    socket.on('checkRoom', (roomId) => {
+    socket.on('checkRoom', async(roomId) => {
         let check;
-        if (allRoomInfo[roomId]){
+        let room = await HGET('host', roomId);
+        if (room){
             check = true;
         }else{
             check = false;
@@ -119,168 +145,239 @@ io.on('connection', (socket) => {
         io.to(socket.id).emit('checkRoom', check);
     });
 
-    //房間
-    socket.on('createRoom', (maxMember, maxScore, publics) => {
+    //rooms
+    socket.on('createRoom', async(maxMember, maxScore, publics) => {
         const roomId = Date.now();
         let room = {};
-        room.roomMaxMember = maxMember;
-        room.roomMaxScore = maxScore;
-        room.roomPublic = publics;
-        room.host = userName;
-        room.roomDraw = 0;
-        room.drawer = userName;
-        room.roomStatus = 'waiting';
-        room.correctNum = 0;
+        client.HSET('roomMaxMember', roomId, maxMember);
+        client.HSET('roomMaxScore', roomId, maxScore);
+        client.HSET('roomPublic', roomId, publics);
+        client.HSET('host', roomId, userName);
+        client.HSET('roomDraw',  roomId, 0);
+        client.HSET('drawer', roomId, userName);
+        client.HSET('roomStatus', roomId, 'waiting');
+        client.HSET('roomMember', roomId, 'Host');
+        client.HSET('correctNum', roomId, 0);
         allRoomInfo[roomId] = room;
-        socket.emit('createRoom', (roomId));
+        socket.emit('createRoom', roomId);
     });
 
-    socket.on('joinRoom', (roomId) => {
+    socket.on('joinRoom', async(roomId) => {
         socket.join(roomId);
-        let thisRoom = allRoomInfo[roomId];
-        if (typeof(thisRoom) != 'undefined'){
-            if (!thisRoom.roomMember){
-                thisRoom.roomMember = [];
+        let roomMembers;
+        let roomMemberString  = await HGET('roomMember', roomId);
+        if (roomMemberString){
+            if (roomMemberString == 'Host'){
+                roomMembers = [];
+            }else{
+                roomMembers = roomMemberString.split(',');
             };
-            if(!thisRoom.roomMember.includes(userName)){
-                thisRoom.roomMember.push(userName);
+            let thisRoom = allRoomInfo[roomId];
+            if (typeof(thisRoom) != 'undefined'){
+                if(!roomMembers.includes(userName)){
+                    roomMembers.push(userName);
+                    client.HSET('roomMember', roomId, roomMembers.toString());
+                };
+                client.HSET('roomScore', userName, 0);
+                const allRoomId = await HKEYS('roomMember');
+                const allRoomMember = await HVALS('roomMember');
+                const allRoomMax = await HVALS('roomMaxMember');
+                const allRoomPublic = await HVALS('roomPublic');
+                const allRoomStatus = await HVALS('roomStatus');
+                io.emit('lobby', allRoomId, allRoomMember, allRoomMax, allRoomPublic, allRoomStatus);
+
+                io.to(roomId).emit('connectToRoom', `${userName}加入了！`);
+
+                let roomMember = await HGET('roomMember', roomId);
+                let roomScore = await HGETALL('roomScore');
+                let roomMaxScore = await HGET('roomMaxScore', roomId);
+                let roomStatus = await HGET('roomStatus', roomId);
+                let host = await HGET('host', roomId);
+                let roomDraw = await HGET('roomDraw', roomId);
+                let drawer = await HGET('drawer', roomId);
+                io.to(roomId).emit('member', roomMember);
+                io.to(roomId).emit('score', roomScore);
+                io.to(socket.id).emit('roomMaxScore', roomMaxScore);
+                io.to(roomId).emit('roomInfo', roomStatus, host, roomMember, thisRoom.topic, roomDraw, drawer);
             };
-            roomScore[userName] = 0;
-            allRoomInfo[roomId] = thisRoom;
-            io.emit('lobby', allRoomInfo);
-            io.to(roomId).emit('connectToRoom', `${userName}加入了！`);
-            io.to(roomId).emit('member', thisRoom.roomMember);
-            io.to(roomId).emit('score', roomScore);
-            io.to(socket.id).emit('roomMaxScore', thisRoom.roomMaxScore);
-            io.to(roomId).emit('roomInfo', thisRoom);
         };
     });
 
-    socket.on('getTimer' , (roomId) => {
-        let thisRoom = allRoomInfo[roomId];
-        if (typeof(thisRoom) != 'undefined'){
-            io.to(socket.id).emit('getTimer', counts[roomId], restCounts[roomId], thisRoom.roomStatus);
-        };
+    socket.on('getTimer' , async(roomId) => {
+            let roomStatus = await HGET('roomStatus', roomId);
+            io.to(socket.id).emit('getTimer', counts[roomId], restCounts[roomId], roomStatus);
     });
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async() => {
         let thisRoom = allRoomInfo[leaveRoomId];
         socket.leave(leaveRoomId); 
-        if (typeof(thisRoom) != 'undefined'){
-            if (typeof(thisRoom.roomMember) != 'undefined'){
-                //刪除成員
-                const index = thisRoom.roomMember.indexOf(userName);
-                if (index !== -1) {
-                    thisRoom.roomMember.splice(index, 1);
-                };
-                //通知成員離開
-                if (typeof(userName) != 'undefined'){
-                    io.to(leaveRoomId).emit('leaveRoom', `${userName}離開了！`);
-                };
-                if (thisRoom.roomStatus == 'playing'){
-                    if (userName == thisRoom.host){
-                        thisRoom.host = thisRoom.roomMember[0];
+        if (typeof(leaveRoomId) != 'undefined'){
+            let roomStatus = await HGET('roomStatus', leaveRoomId);
+            let host = await HGET('host', leaveRoomId);
+            let drawer = await HGET('drawer', leaveRoomId);
+            let roomDraw = Number(await HGET('roomDraw', leaveRoomId));
+            let correctNum = Number(await HGET('correctNum', leaveRoomId));
+            let roomMembers;
+            let roomMemberString  = await HGET('roomMember', leaveRoomId);
+            if (typeof(thisRoom) != 'undefined'){
+                if (roomMemberString){
+                    //delete player
+                    if (roomMemberString == '[]'){
+                        roomMembers = [];
+                    }else{
+                        roomMembers = roomMemberString.split(',');
                     };
-                    if (userName == thisRoom.drawer){
-                        thisRoom.roomStatus = 'resting';
-                        if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
-                            thisRoom.roomDraw = 0;
-                        }else{
-                            thisRoom.roomDraw ++;
+                    const index = roomMembers.indexOf(userName);
+                    if (index !== -1) {
+                        roomMembers.splice(index, 1);
+                        client.HSET('roomMember', leaveRoomId, roomMembers.toString());
+                    };
+                    client.HDEL('roomScore', userName);
+
+                    if (typeof(userName) != 'undefined'){
+                        io.to(leaveRoomId).emit('leaveRoom', `${userName}離開了！`);
+                    };
+
+                    if (roomStatus == 'playing'){
+                        if (userName == host){
+                            client.HSET('host', leaveRoomId, roomMembers[0]);
                         };
-                        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
-                        allRoomInfo[leaveRoomId] = thisRoom;
-                        io.to(leaveRoomId).emit('nextDrawer', thisRoom.drawer);
-                        io.to(leaveRoomId).emit('stopTimer');
-                        io.to(leaveRoomId).emit('stopGetTimer');
-                        io.to(leaveRoomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
+
+                        if (userName == drawer){
+                            client.HSET('roomStatus', leaveRoomId, 'resting');
+                            if (roomDraw +1 == roomMembers.length){
+                                client.HSET('roomDraw', leaveRoomId, 0);
+                                roomDraw = 0;
+                            };
+                            drawer = roomMembers[roomDraw];
+                            client.HSET('drawer', leaveRoomId, drawer);
+                            io.to(leaveRoomId).emit('nextDrawer', drawer);
+                            io.to(leaveRoomId).emit('stopTimer');
+                            io.to(leaveRoomId).emit('stopGetTimer');
+                            let host = await HGET('host', leaveRoomId);
+                            io.to(leaveRoomId).emit('startTimer', 'resting', host);
+                        };
+
+                        if (roomDraw == roomMembers.length){
+                            roomDraw = 0;
+                            client.HSET('roomDraw', leaveRoomId, 0);
+                            drawer = roomMembers[roomDraw];
+                            client.HSET('drawer', leaveRoomId, drawer);
+                        };
+
+                        if (roomMembers.length == 1){
+                            clearInterval(timers[leaveRoomId]);
+                            clearInterval(restTimers[leaveRoomId]);
+                            delete timers[leaveRoomId];
+                            delete restTimers[leaveRoomId];
+                            io.to(leaveRoomId).emit('stopTimer');
+                            io.to(leaveRoomId).emit('stopRestTimer');
+                            io.to(leaveRoomId).emit('stopGetTimer');
+                            client.HSET('correctNum', leaveRoomId, 0);
+                            client.HSET('roomStatus', leaveRoomId, 'waiting');
+                        }else if (correctNum +1 >= roomMembers.length){
+                            clearInterval(timers[leaveRoomId]);
+                            clearInterval(restTimers[leaveRoomId]);
+                            delete timers[leaveRoomId];
+                            delete restTimers[leaveRoomId];
+                            client.HSET('correctNum', leaveRoomId, 0);
+                            client.HSET('roomStatus', leaveRoomId, 'resting');
+                            if (roomDraw +1 == roomMembers.length){
+                                client.HSET('roomDraw', leaveRoomId, 0);
+                                roomDraw = 0;
+                            }else{
+                                client.HINCRBY('roomDraw', leaveRoomId, 1);
+                                roomDraw ++;
+                            };
+                            drawer = roomMembers[roomDraw];
+                            client.HSET('drawer', leaveRoomId, drawer);
+                            io.to(leaveRoomId).emit('everyoneCorrected');
+                            io.to(leaveRoomId).emit('nextDrawer', drawer);
+                            io.to(leaveRoomId).emit('stopTimer');
+                            io.to(leaveRoomId).emit('stopGetTimer');
+                            let host = await HGET('host', leaveRoomId);
+                            io.to(leaveRoomId).emit('startTimer', 'resting', host);
+                        };
                     };
-                    if (thisRoom.roomDraw == thisRoom.roomMember.length){
-                        thisRoom.roomDraw = 0;
-                        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
-                        allRoomInfo[leaveRoomId] = thisRoom;
+
+                    if (roomStatus == 'resting'){
+                        if (userName == host){
+                            client.HSET('host', leaveRoomId, roomMembers[0]);
+                        };
+
+                        if (roomDraw == roomMembers.length){
+                            roomDraw = 0;
+                            client.HSET('roomDraw', leaveRoomId, 0);
+                            drawer = roomMembers[0];
+                            client.HSET('drawer', leaveRoomId, drawer);
+                            io.to(leaveRoomId).emit('nextDrawer', drawer);
+                        }else if (userName == drawer){
+                            drawer = roomMembers[roomDraw];
+                            client.HSET('drawer', leaveRoomId, drawer);
+                            io.to(leaveRoomId).emit('nextDrawer', drawer);
+                        };
+
+                        if (roomMembers.length == 1){
+                            clearInterval(restTimers[leaveRoomId]);
+                            delete restTimers[leaveRoomId];
+                            io.to(leaveRoomId).emit('stopRestTimer');
+                            io.to(leaveRoomId).emit('stopGetTimer');
+                            client.HSET('correctNum', leaveRoomId, 0);
+                            client.HSET('roomStatus', leaveRoomId, 'waiting');
+                        };
                     };
-                    if (thisRoom.roomMember.length == 1){
+
+                    if (roomStatus == 'ending'){
+                        if (userName == host){
+                            client.HSET('host', leaveRoomId, roomMembers[0]);
+                        };
+                    };
+
+                    if (roomMembers.length == 0){
+                        client.HDEL('host', leaveRoomId);
+                        client.HDEL('drawer', leaveRoomId);
+                        client.HDEL('correctNum', leaveRoomId);
+                        client.HDEL('roomMaxMember', leaveRoomId);
+                        client.HDEL('roomStatus', leaveRoomId);
+                        client.HDEL('roomMaxScore', leaveRoomId);
+                        client.HDEL('roomPublic', leaveRoomId);
+                        client.HDEL('roomMember', leaveRoomId);
+                        client.HDEL('roomDraw', leaveRoomId);
+                        client.HDEL('roomRound', leaveRoomId);
+                        delete allRoomInfo[leaveRoomId];
                         clearInterval(timers[leaveRoomId]);
                         clearInterval(restTimers[leaveRoomId]);
                         delete timers[leaveRoomId];
                         delete restTimers[leaveRoomId];
-                        io.to(leaveRoomId).emit('stopTimer');
-                        io.to(leaveRoomId).emit('stopRestTimer');
-                        io.to(leaveRoomId).emit('stopGetTimer');
-                        thisRoom.correctNum = 0;
-                        thisRoom.roomStatus = 'waiting';
-                        allRoomInfo[leaveRoomId] = thisRoom;
-                    }else if (thisRoom.correctNum +1 >= thisRoom.roomMember.length){
-                        thisRoom.correctNum = 0;
-                        clearInterval(timers[leaveRoomId]);
-                        clearInterval(restTimers[leaveRoomId]);
-                        delete timers[leaveRoomId];
-                        delete restTimers[leaveRoomId];
-                        thisRoom.roomStatus = 'resting';
-                        if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
-                            thisRoom.roomDraw = 0;
-                        }else{
-                            thisRoom.roomDraw ++;
-                        };
-                        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
-                        allRoomInfo[leaveRoomId] = thisRoom;
-                        io.to(leaveRoomId).emit('everyoneCorrected');
-                        io.to(leaveRoomId).emit('nextDrawer', thisRoom.drawer);
-                        io.to(leaveRoomId).emit('stopTimer');
-                        io.to(leaveRoomId).emit('stopGetTimer');
-                        io.to(leaveRoomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
                     };
                 };
-                if (thisRoom.roomStatus == 'resting'){
-                    if (userName == thisRoom.host){
-                        thisRoom.host = thisRoom.roomMember[0];
-                    };
-                    if (userName == thisRoom.drawer){
-                        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
-                        io.to(leaveRoomId).emit('nextDrawer', thisRoom.drawer);
-                    };
-                    if (thisRoom.roomDraw == thisRoom.roomMember.length){
-                        thisRoom.roomDraw = 0;
-                        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
-                    };
-                    if (thisRoom.roomMember.length == 1){
-                        clearInterval(restTimers[leaveRoomId]);
-                        delete restTimers[leaveRoomId];
-                        io.to(leaveRoomId).emit('stopRestTimer');
-                        io.to(leaveRoomId).emit('stopGetTimer');
-                        thisRoom.correctNum = 0;
-                        thisRoom.roomStatus = 'waiting';
-                    };
-                    allRoomInfo[leaveRoomId] = thisRoom;
-                };
-                if (thisRoom.roomStatus == 'ending'){
-                    if (userName == thisRoom.host){
-                        thisRoom.host = thisRoom.roomMember[0];
-                    };
-                    allRoomInfo[leaveRoomId] = thisRoom;
-                };
-                if (thisRoom.roomMember.length == 0){
-                    delete allRoomInfo[leaveRoomId];
-                    clearInterval(timers[leaveRoomId]);
-                    clearInterval(restTimers[leaveRoomId]);
-                    delete timers[leaveRoomId];
-                    delete restTimers[leaveRoomId];
-                    delete roomScore.userName;
-                };
+
+                const allRoomId = await HKEYS('roomMember');
+                const allRoomMember = await HVALS('roomMember');
+                const allRoomMax = await HVALS('roomMaxMember');
+                const allRoomPublic = await HVALS('roomPublic');
+                const allRoomStatus = await HVALS('roomStatus');
+                io.emit('lobby', allRoomId, allRoomMember, allRoomMax, allRoomPublic, allRoomStatus);
+
+                let roomMember = await HGET('roomMember', leaveRoomId);
+                io.to(leaveRoomId).emit('member', roomMember);
+                let roomScore = await HGETALL('roomScore');
+                io.to(leaveRoomId).emit('score', roomScore);
+                let roomStatusNew = await HGET('roomStatus', leaveRoomId);
+                let hostNew = await HGET('host', leaveRoomId);
+                let roomDrawNew = await HGET('roomDraw', leaveRoomId);
+                let drawerNew = await HGET('drawer', leaveRoomId);
+                io.to(leaveRoomId).emit('roomInfo', roomStatusNew, hostNew, roomMember, thisRoom.topic, roomDrawNew, drawerNew);
             };
-            io.emit('lobby', allRoomInfo);
-            io.to(leaveRoomId).emit('member', thisRoom.roomMember);
-            io.to(leaveRoomId).emit('score', roomScore);
-            io.to(leaveRoomId).emit('roomInfo', thisRoom);
         };
     });
 
-    //遊戲流程
-    socket.on('beginGame', (roomId) => {
+    //game system
+    socket.on('beginGame', async(roomId) => {
         let thisRoom = allRoomInfo[roomId];
-        thisRoom.roomRound = 1;
-        thisRoom.roomStatus = 'playing';
+        client.HSET('roomRound', roomId, 1);
+        client.HSET('roomStatus', roomId, 'playing');
+
         if (!thisRoom.topicIndex){
             thisRoom.topicIndex = [];
         };
@@ -299,138 +396,196 @@ io.on('connection', (socket) => {
                 };
             thisRoom.topicIndex.push(str);
         };
-        thisRoom.topic = topics[thisRoom.topicIndex[thisRoom.roomRound]];
+        thisRoom.topic = topics[thisRoom.topicIndex[1]];
+
         allRoomInfo[roomId] = thisRoom;
-        io.to(roomId).emit('roomInfo', thisRoom);
-        io.to(roomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
+        let roomMember = await HGET('roomMember', roomId);
+        let host = await HGET('host', roomId);
+        let roomDraw = await HGET('roomDraw', roomId);
+        let drawer = await HGET('drawer', roomId);
+        io.to(roomId).emit('roomInfo', 'playing', host, roomMember, thisRoom.topic, roomDraw, drawer);
+        io.to(roomId).emit('startTimer', 'playing', host);
+        io.emit(allRoomInfo[roomId]);        
     });
 
-    socket.on('win', (roomId, user) => {
+    socket.on('win', async(roomId, user) => {
         let thisRoom = allRoomInfo[roomId];
-
-        if (thisRoom.correctNum <= 5){
-            roomScore[thisRoom.drawer] ++;
+        let roomMembers = await HGET('roomMember', roomId);
+        let roomMember = roomMembers.split(',');
+        let correctNum = Number(await HGET('correctNum', roomId));
+        let drawer = await HGET('drawer', roomId);
+        if (correctNum <= 5){
+            client.HINCRBY('roomScore', drawer, 1);
         };
-        roomScore[user] +=2;
-        io.to(roomId).emit('winScore', roomScore[user], user, roomScore[thisRoom.drawer], thisRoom.drawer);
-        
-        thisRoom.correctNum ++;
-        if (roomScore[user] >= thisRoom.roomMaxScore){
+        client.HINCRBY('roomScore', user, 2);
+        let userScore = Number(await HGET('roomScore', user));
+        let drawerScore = Number(await HGET('roomScore', drawer));
+        io.to(roomId).emit('winScore', userScore, user, drawerScore, drawer);
+
+        client.HINCRBY('correctNum', roomId, 1);
+        correctNum ++;
+        let roomMaxScore = Number(await HGET('roomMaxScore', roomId));
+        if (userScore >= roomMaxScore){
             clearInterval(timers[roomId]);
             clearInterval(restTimers[roomId]);
             delete timers[roomId];
             delete restTimers[roomId];
             io.to(roomId).emit('stopTimer');
             io.to(roomId).emit('stopGetTimer');
-            thisRoom.roomStatus = 'ending';
+            client.HSET('roomStatus', roomId, 'ending');
             io.to(roomId).emit('winnerUser', user);
-            allRoomInfo[roomId] = thisRoom;
-            io.to(roomId).emit('roomInfo', thisRoom);
-        }else if (roomScore[thisRoom.drawer] >= thisRoom.roomMaxScore){
+            let host = await HGET('host', roomId);
+            let roomDraw = await HGET('roomDraw', roomId);
+            let drawer = await HGET('drawer', roomId);
+            io.to(roomId).emit('roomInfo', 'ending', host, roomMembers, thisRoom.topic, roomDraw, drawer);
+        }else if (drawerScore >= roomMaxScore){
             clearInterval(timers[roomId]);
             clearInterval(restTimers[roomId]);
             delete timers[roomId];
             delete restTimers[roomId];
             io.to(roomId).emit('stopTimer');
             io.to(roomId).emit('stopGetTimer');
-            thisRoom.roomStatus = 'ending';
-            io.to(roomId).emit('winnerDraw', thisRoom.drawer);
-            allRoomInfo[roomId] = thisRoom;
-            io.to(roomId).emit('roomInfo', thisRoom);
-        }else if (thisRoom.correctNum +1 >= thisRoom.roomMember.length){
-            thisRoom.correctNum = 0;
+            client.HSET('roomStatus', roomId, 'ending');
+            io.to(roomId).emit('winnerDraw', drawer);
+            let host = await HGET('host', roomId);
+            let roomDraw = await HGET('roomDraw', roomId);
+            let drawer = await HGET('drawer', roomId);
+            io.to(roomId).emit('roomInfo', 'ending', host, roomMembers, thisRoom.topic, roomDraw, drawer);
+        }else if (correctNum +1 >= roomMember.length){
+            let roomDraw = Number(await HGET('roomDraw', roomId));
+            client.HSET('correctNum', roomId, 0);
+            client.HSET('roomStatus', roomId, 'resting');
             clearInterval(timers[roomId]);
             clearInterval(restTimers[roomId]);
             delete timers[roomId];
             delete restTimers[roomId];
-            thisRoom.roomStatus = 'resting';
-            if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
-                thisRoom.roomDraw = 0;
+
+            if (roomDraw +1 == roomMember.length){
+                client.HSET('roomDraw', roomId, 0);
+                roomDraw = 0;
             }else{
-                thisRoom.roomDraw ++;
+                client.HINCRBY('roomDraw', roomId, 1);
+                roomDraw ++;
             };
-            thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
+            drawer = roomMember[roomDraw];
+            client.HSET('drawer', roomId, drawer);
+
             allRoomInfo[roomId] = thisRoom;
+            let host = await HGET('host', roomId);
             io.to(roomId).emit('stopTimer');
             io.to(roomId).emit('stopGetTimer');
-            io.to(roomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
-            io.to(roomId).emit('roomInfo', thisRoom);
+            io.to(roomId).emit('startTimer', 'resting', host);
+            io.to(roomId).emit('roomInfo', 'resting', host, roomMembers, thisRoom.topic, roomDraw, drawer);
             io.to(roomId).emit('everyoneCorrected');
-            io.to(roomId).emit('nextDrawer', thisRoom.drawer);
+            io.to(roomId).emit('nextDrawer', drawer);
         };
     });
 
-    socket.on('startTimer', (roomId) => {
+    socket.on('startTimer', async(roomId) => {
         let count = 100;
         let min = 1/64;
         if (!timers[roomId]){
-            timer = setInterval(() =>{
+            timer = setInterval(async() =>{
                 count -= min;
                 counts[roomId] = count;
                 if (count <= 0) {
+                    let roomDraw = Number(await HGET('roomDraw', roomId));
+                    let roomMembers = await HGET('roomMember', roomId);
+                    let roomMember = roomMembers.split(',');
+                    let drawer = await HGET('drawer', roomId);
                     clearInterval(timers[roomId]);
                     delete timers[roomId];
                     let thisRoom = allRoomInfo[roomId];
-                    thisRoom.roomStatus = 'resting';
-                    if (thisRoom.roomDraw +1 == thisRoom.roomMember.length){
-                        thisRoom.roomDraw = 0;
+                    client.HSET('roomStatus', roomId, 'resting');
+
+                    if (roomDraw +1 == roomMember.length){
+                        client.HSET('roomDraw', roomId, 0);
+                        roomDraw = 0;
                     }else{
-                        thisRoom.roomDraw ++;
+                        client.HINCRBY('roomDraw', roomId, 1);
+                        roomDraw ++;
                     };
-                    thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
-                    allRoomInfo[roomId] = thisRoom;
-                    io.to(roomId).emit('roomInfo', thisRoom);
-                    io.to(roomId).emit('nextDrawer', thisRoom.drawer);
+                    drawer = roomMember[roomDraw];
+                    client.HSET('drawer', roomId, drawer);
+
+                    let host = await HGET('host', roomId);
+                    io.to(roomId).emit('roomInfo', 'resting', host, roomMembers, thisRoom.topic, roomDraw, drawer);
+                    io.to(roomId).emit('nextDrawer', drawer);
                     io.to(roomId).emit('lose', thisRoom.topic);
                     io.to(roomId).emit('stopTimer');
                     io.to(roomId).emit('stopGetTimer');
-                    io.to(roomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
+                    io.to(roomId).emit('startTimer', 'resting', host);
                 };
             }, 10);
         };
         timers[roomId] = timer;
     });
 
-    socket.on('startRestTimer', (roomId) => {
-        let thisRoom = allRoomInfo[roomId];
+    socket.on('startRestTimer', async(roomId) => {
         let restCount = 100;
         let restMin = 1/8;
         if (!restTimers[roomId]){
-            restTimer = setInterval(() =>{
+            restTimer = setInterval(async() =>{
             restCount -= restMin;
             restCounts[roomId] = restCount;
             if (restCount <= 0) {
+                let thisRoom = allRoomInfo[roomId];
+                let host = await HGET('host', roomId);
+                let roomDraw = Number(await HGET('roomDraw', roomId));
+                let drawer = await HGET('drawer', roomId);
+                let roomMembers = await HGET('roomMember', roomId);
                 clearInterval(restTimers[roomId]);
                 delete restTimers[roomId];
-                thisRoom.roomStatus = 'playing';
-                thisRoom.roomRound ++;
-                thisRoom.topic = topics[thisRoom.topicIndex[thisRoom.roomRound]];
+                client.HSET('roomStatus', roomId, 'playing');
+
+                let roomRound = Number(await HGET('roomRound', roomId));
+                roomRound ++;
+                client.HINCRBY('roomRound', roomId, 1);
+
+                thisRoom.topic = topics[thisRoom.topicIndex[roomRound]];
                 allRoomInfo[roomId] = thisRoom;
-                io.to(roomId).emit('roomInfo', thisRoom);
-                io.to(roomId).emit('drawer', thisRoom.drawer);
+                io.to(roomId).emit('roomInfo', 'playing', host, roomMembers, thisRoom.topic, roomDraw, drawer);
+                io.to(roomId).emit('drawer', drawer);
                 io.to(roomId).emit('stopRestTimer');
                 io.to(roomId).emit('stopGetTimer');
-                io.to(roomId).emit('startTimer', thisRoom.roomStatus, thisRoom.host);
+                io.to(roomId).emit('startTimer', 'playing', host);
                 };
             }, 10);
         };
         restTimers[roomId] = restTimer;
     });
 
-    socket.on('refresh', (roomId) => {
-        let thisRoom = allRoomInfo[roomId];
-        thisRoom.roomStatus = 'waiting';
-        thisRoom.roomDraw = 0;
-        thisRoom.correctNum = 0;
-        thisRoom.drawer = thisRoom.roomMember[thisRoom.roomDraw];
-        for (let i = 0; i<thisRoom.roomMember.length; i++) {
-            roomScore[thisRoom.roomMember[i]] = 0;
+    socket.on('refresh', async(roomId) => {
+        let roomMembers;
+        let roomMemberString  = await HGET('roomMember', leaveRoomId);
+        if (roomMemberString == '[]'){
+            roomMembers = [];
+        }else{
+            roomMembers = roomMemberString.split(',');
         };
+        let thisRoom = allRoomInfo[roomId];
+        client.HSET('roomStatus', roomId, 'waiting');
+
+        roomDraw = 0;
+        client.HSET('roomDraw', roomId, 0);
+
+        correctNum = 0;
+        client.HSET('correctNum', roomId, 0);
+
+        drawer = roomMembers[0];
+        client.HSET('drawer', roomId, drawer);
+
+        for (let i = 0; i<roomMembers.length; i++) {
+            client.HSET('roomScore', roomMembers[i], 0);
+        };
+
         delete thisRoom.topic;
         allRoomInfo[roomId] = thisRoom;
-        io.to(roomId).emit('member', thisRoom.roomMember);
+        let roomScore = await HGETALL('roomScore');
+        let host = await HGET('host', roomId);
+        io.to(roomId).emit('member', roomMemberString);
         io.to(roomId).emit('score', roomScore);
-        io.to(roomId).emit('roomInfo', thisRoom);
+        io.to(roomId).emit('roomInfo', 'waiting', host, roomMemberString, thisRoom.topic, roomDraw, drawer);
     });
 
     //聊天室

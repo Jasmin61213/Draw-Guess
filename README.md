@@ -45,7 +45,9 @@ Have fun with your friends!
 
 ### Cloud Service
 * AWS EC2
+* AWS load balancer
 * AWS RDS
+* AWS ElastiCache
 
 ### Version Control
 * Git

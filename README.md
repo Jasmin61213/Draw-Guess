@@ -27,7 +27,7 @@ Have fun with your friends!
 
 * Multiple Room Online
 
-![draw12](https://user-images.githubusercontent.com/110441965/222966535-bcb29315-70ae-4eb5-8f88-4dfaa9a0be20.gif)
+![draw13](https://user-images.githubusercontent.com/110441965/222966689-0f83aa66-ad3b-4aba-9096-b0266c3c6dab.gif)
 
 ## Backend Technique
 ### Infrastructure

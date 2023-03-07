@@ -56,21 +56,22 @@ Draw-Guess allows players to create thier own room and invite up to 50 friends b
 
 ### Library
 * Socket.IO
-* Socket.IO/Redis adapter
+* Socket.IO/ Redis adapter
 
-### Databases
+### Database
 * MySQL
 * Redis
 
 ### Cloud Service
 * AWS EC2
-* AWS load balancer
+* AWS Elastic Load Balancer
+* AWS Auto Scaling
 * AWS RDS
 * AWS ElastiCache
 
 ### Version Control
 * Git
-* Github
+* GitHub
 
 ### Networking
 * Nginx
@@ -79,7 +80,7 @@ Draw-Guess allows players to create thier own room and invite up to 50 friends b
 ## Frontend Technique
 * HTML
 * CSS
-* Javascript
+* JavaScript
 * HTML5 Canvas
 
 ## Artictecture

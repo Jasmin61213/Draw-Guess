@@ -3,7 +3,6 @@
 
 body{
     background: #ECE2D0;
-    /* font-family: 'Rowdies', cursive; */
     font-family: 'Noto Sans TC', sans-serif;
     margin: 0;
 }
@@ -201,6 +200,7 @@ input[type="radio"]{
 }
 
 .no-room-text{
+    font-family: 'Rowdies', cursive;
     font-size: 28px;
     color: #65524D;
     text-align: center;
@@ -290,6 +290,7 @@ input[type="radio"]{
 }
 
 .change-text{
+    font-family: 'Rowdies', cursive;
     margin: 12px 0 10px 0;
     font-size: 28px;
     color: #65524D;

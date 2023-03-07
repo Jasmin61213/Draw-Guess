@@ -23,7 +23,6 @@ if (document.readyState === "complete"){
 const getRooms = setInterval(() =>{
     socket.emit('getRoom');
 }, 1000);
-// socket.emit('getRoom');
 
 const newRoom = document.querySelector('.button');
 const create = document.querySelector('.remind-button');
@@ -115,17 +114,11 @@ socket.on('lobby', (allRoomId, allRoomMembers, allRoomMax, allRoomPublic, allRoo
     for (i = 0; i<block.length; i++){
         block[i].remove();
     };
-    // const allRoomId = Object.keys(allRoomInfo); 
-    // const allRoomMember = Object.values(allRoomInfo).map(item => item.roomMember);
-    // const allRoomMax = Object.values(allRoomInfo).map(item => item.roomMaxMember);
-    // const allRoomPublic = Object.values(allRoomInfo).map(item => item.roomPublic);
-    // const allRoomStatus = Object.values(allRoomInfo).map(item => item.roomStatus);
     if (!allRoomPublic.includes('public')){
         noRoom.style.display = 'block';
     }else{
         for (let i=0; i<allRoomId.length; i++){
             const allRoomMember = allRoomMembers[i].split(',');
-            // console.log(allRoomMember)
             noRoom.style.display = 'none';
             const roomBlock = document.createElement('a');
             const roomOwner = document.createElement('div');
@@ -134,40 +127,40 @@ socket.on('lobby', (allRoomId, allRoomMembers, allRoomMax, allRoomPublic, allRoo
             roomBlock.className = 'block';
             if (allRoomPublic[i]){
                 if (allRoomMember.length >= allRoomMax[i]){
-                    roomMemberBlock.textContent = '額滿';
+                    roomMemberBlock.textContent = 'FULL';
                     roomMemberBlock.className = 'memberText';
                     if (allRoomStatus[i] == 'waiting'){
-                        roomStatusBlock.textContent = '等待中...';
+                        roomStatusBlock.textContent = 'Waiting...';
                     }else if (allRoomStatus[i] == 'playing'){
-                        roomStatusBlock.textContent = '遊玩中...';
+                        roomStatusBlock.textContent = 'Playing...';
                     }else if (allRoomStatus[i] == 'resting'){
-                        roomStatusBlock.textContent = '休息中...';
+                        roomStatusBlock.textContent = 'Resting...';
                     }else{
-                        roomStatusBlock.textContent = '贏家出爐了！';
+                        roomStatusBlock.textContent = 'Winner！';
                     };
                     roomBlock.style.backgroundColor = '#efe6dd';
                     roomBlock.style.cursor = 'not-allowed';
                     roomStatusBlock.className = 'statusText';
                 }else{
-                    roomMemberBlock.textContent = `人數：${allRoomMember.length} / ${allRoomMax[i]}`;
+                    roomMemberBlock.textContent = `Players：${allRoomMember.length} / ${allRoomMax[i]}`;
                     roomMemberBlock.className = 'memberText';
                     if (allRoomStatus[i] == 'waiting'){
-                        roomStatusBlock.textContent = '等待中...';
+                        roomStatusBlock.textContent = 'Waiting....';
                         roomBlock.href = '/draw?room='+allRoomId[i];
                     }else if (allRoomStatus[i] == 'playing'){
-                        roomStatusBlock.textContent = '遊玩中...';
+                        roomStatusBlock.textContent = 'Playing...';
                         roomBlock.style.backgroundColor = '#efe6dd';
                         roomBlock.style.cursor = 'not-allowed';
                     }else if (allRoomStatus[i] == 'resting'){
-                        roomStatusBlock.textContent = '休息中...';
+                        roomStatusBlock.textContent = 'Resting...';
                         roomBlock.href = '/draw?room='+allRoomId[i];
                     }else{
-                        roomStatusBlock.textContent = '贏家出爐了！';
+                        roomStatusBlock.textContent = 'Winner！';
                         roomBlock.href = '/draw?room='+allRoomId[i];
                     };
                     roomStatusBlock.className = 'statusText';
                 };
-                roomOwner.textContent = '房主：'+allRoomMember[0];
+                roomOwner.textContent = 'Host：'+allRoomMember[0];
                 roomOwner.className = 'ownerText';
                 roomBlock.appendChild(roomOwner);
                 roomBlock.appendChild(roomMemberBlock);

@@ -771,11 +771,12 @@ input:focus{
     position: absolute;
     top: 10px;
     right: 10px;
-    width: 24px;
+    width: 20px;
 }
 
 .share-text{
-    margin-top: 25px;
+    font-family: 'Rowdies', cursive;
+    margin-top: 30px;
     font-size: 24px;
     color: #65524D;
     text-align: center;
@@ -799,6 +800,7 @@ input:focus{
 }
 
 .success{
+    font-family: 'Rowdies', cursive;
     display: none;
     position: absolute;
     top: 140px;

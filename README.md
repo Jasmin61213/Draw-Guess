@@ -8,11 +8,11 @@
 * momo@gmail.com / 1213
 * ray@gmail.com / 1213
 
-Draw-Guess can make you have fun guessing and drawing! Every round a Player is chosen to draw something for the others to guess what it is.
-The first player to achieve the goal of points will be declared the game winner.
+#### Be your own artist and gather your friends!
 
-Draw-Guess also allows the player to create his own room and invite up to 50 friends sharing a link to the room.
-Have fun with your friends!
+Draw-Guess is a free multiplayer online game for friends and families all around the world! As one player being the artist, other players take guesses and typing the right answer to win point. Everyone gets a chance to be his/hers own artist each round! The first player getting goal points is the winner of the game.
+
+Draw-Guess allows players to create thier own room and invite up to 50 friends by the link provided. Just get started and show friends your masterpiece! :)
 
 ## 🔖 Catalog
 * [Main Features](#main-features)
@@ -85,7 +85,7 @@ Have fun with your friends!
 ## Artictecture
 
 ### Backend Artictecture
-<img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/222963764-ee50f194-202e-41a9-80f6-37c55aa03de0.png">
+<img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/223435989-6e7f1b3c-24b6-49bb-bf83-f01d63ef0f8e.png">
 
 ### Message Flow of Room System
 <img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/222770882-a627ff62-ca28-4919-9458-d9409ab629fc.png">

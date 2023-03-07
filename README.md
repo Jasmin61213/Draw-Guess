@@ -37,16 +37,16 @@ Draw-Guess allows players to create thier own room and invite up to 50 friends b
 ![未命名2拷貝](https://user-images.githubusercontent.com/110441965/222968145-7bcfa219-f28a-412d-b585-65e88986a98c.gif)
 
 * Multiple Player Online
-  * As one player being the artist, other players take guesses and typing the right answer to win point.
-  * If drawer leaves the room, an intermission will be entered and the next player will paint.
-  * If host leaves the room, the next player will be the host.
-  * Many players can guess the answer correctly in each round, and when everyone guesses correctly, it will enter the intermission.
-  * When player achieve the goal, he/she will be the winner.
+  * One player acts as the artist while the other players take turns guessing and typing the correct answer to earn points.
+  * If the drawer leaves the room, an intermission will be called and the next player will take over.
+  * If the host leaves the room, the next player will become the host.
+  * Multiple players can guess correctly in each round, and when everyone has guessed correctly, an intermission will be called.
+  * The player who reaches the goal will be declared the winner.
  
 ![draw11](https://user-images.githubusercontent.com/110441965/222966361-9533dc8a-2668-4dfa-98e2-2552d5c5e195.gif)
 
 * Multiple Room Online
-  * Players can create public rooms, and other players can enter the room from the lobby, or create a private room, share the link and invite friends to join.
+  * Players can create public rooms, and other players can enter the room from the lobby. Alternatively, they can create a private room, share the link, and invite friends to join.
 
 ![draw13](https://user-images.githubusercontent.com/110441965/222966689-0f83aa66-ad3b-4aba-9096-b0266c3c6dab.gif)
 

@@ -8,7 +8,7 @@
 * momo@gmail.com / 1213
 * ray@gmail.com / 1213
 
-#### 🙌 Be your own artist and gather your friends!
+## Game intro
 
 Draw-Guess is a free multiplayer online game for friends and families all around the world! As one player being the artist, other players take guesses and typing the right answer to win point. Everyone gets a chance to be his/hers own artist each round! The first player getting goal points is the winner of the game.
 
@@ -98,6 +98,6 @@ Draw-Guess allows players to create thier own room and invite up to 50 friends b
 ### Message Flow of Game System
 <img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/223493525-270ac904-3e99-4932-9a6f-43ef21faf993.png">
 
-## 📪 Contact
+## Contact
 * 傅雅得 Jasmin Fu
-* Email : ytfu1213@gmail.com
+* 📪 Email : ytfu1213@gmail.com

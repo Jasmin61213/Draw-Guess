@@ -93,11 +93,10 @@ Draw-Guess allows players to create thier own room and invite up to 50 friends b
 <img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/223435989-6e7f1b3c-24b6-49bb-bf83-f01d63ef0f8e.png">
 
 ### Message Flow of Room System
-<img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/222770882-a627ff62-ca28-4919-9458-d9409ab629fc.png">
+<img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/223493418-0874e11d-0c3b-4d8e-809f-8d7051fe44ce.png">
 
 ### Message Flow of Game System
-<img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/222771086-5364bb5e-cc5a-483b-a5df-f399b3d4de93.png">
-
+<img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/223493525-270ac904-3e99-4932-9a6f-43ef21faf993.png">
 
 ## 📪 Contact
 * 傅雅得 Jasmin Fu

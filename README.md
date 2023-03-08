@@ -32,7 +32,7 @@ Draw-Guess allows players to create thier own room and invite up to 50 friends b
 * [Contact](#contact)
 
 ## Main Features
-* Use Socket.IO for real time drawing, chating and guessing.
+* Use Socket.IO for real time drawing, chatting and guessing.
 
 ![未命名2拷貝](https://user-images.githubusercontent.com/110441965/222968145-7bcfa219-f28a-412d-b585-65e88986a98c.gif)
 

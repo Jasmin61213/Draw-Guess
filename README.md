@@ -8,7 +8,7 @@
 * momo@gmail.com / 1213
 * ray@gmail.com / 1213
 
-## Game intro
+## Game Intro
 
 Draw-Guess is a free multiplayer online game for friends and families all around the world! As one player being the artist, other players take guesses and typing the right answer to win point. Everyone gets a chance to be his/hers own artist each round! The first player getting goal points is the winner of the game.
 
@@ -25,6 +25,7 @@ Draw-Guess allows players to create thier own room and invite up to 50 friends b
   * [Version Control](#version-control)
   * [Networking](#networking)
 * [Frontend Technique](#frontend-technique)
+* [Scalable System](#scalable-system)
 * [Artictecture](#artictecture)
   * [Backend Artictecture](#backend-artictecture)
   * [Message Flow of Room System](#message-flow-of-room-system)
@@ -87,8 +88,17 @@ Draw-Guess allows players to create thier own room and invite up to 50 friends b
 * JavaScript
 * HTML5 Canvas
 
-## Artictecture
+## Scalable System
+* Use redis adapter to realize the function of emitting messages between different servers.
+* AWS ELB can distribute incoming traffic across multiple servers.
+<img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/223946631-8fe4d589-45b6-4939-a20b-70dd76c65e8b.png">
 
+* Monitoring metrics from instances and auto scaling group using AWS CloudWatch.
+* AWS Auto Scaling enables horizontal scaling based on AWS CloudWatch Alarms.
+  * One instance is added when average CPU utilization approaches 50%.
+<img width="398" alt="image" src="https://user-images.githubusercontent.com/110441965/223951558-cf2fcc51-873e-4354-a388-c81afa2d217e.png">
+
+## Artictecture
 ### Backend Artictecture
 <img width="846" alt="image" src="https://user-images.githubusercontent.com/110441965/223435989-6e7f1b3c-24b6-49bb-bf83-f01d63ef0f8e.png">
 

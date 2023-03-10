@@ -10,7 +10,7 @@
 
 ## Game Intro
 
-Draw-Guess is a free multiplayer online game for friends and families all around the world! As one player being the artist, other players take guesses and typing the right answer to win point. Everyone gets a chance to be his/hers own artist each round! The first player getting goal points is the winner of the game.
+Draw-Guess is a multiplayer online game for friends and families all around the world! As one player being the artist, other players take guesses and typing the right answer to win point. Everyone gets a chance to be his/hers own artist each round! The first player getting goal points is the winner of the game.
 
 Draw-Guess allows players to create thier own room and invite up to 50 friends by the link provided. Just get started and show friends your masterpiece! :)
 
